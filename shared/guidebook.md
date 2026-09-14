@@ -31,7 +31,8 @@ Run from the repository root:
 
 The script copies `shared/cadence-core.md` into `so-bug-review-interview/`,
 `so-build-feature-interview/`, and `so-skills/`. It also copies
-`shared/platform.example.md` into `so-init/`. Edit the shared source files and
+`shared/platform.example.md` into `so-init/` and `shared/guidebook.md` into
+`so-best-practice-audit/references/`. Edit the shared source files and
 rerun the script; changes made directly to those copies will be overwritten.
 
 The build only synchronizes local files. Installation is a separate step.

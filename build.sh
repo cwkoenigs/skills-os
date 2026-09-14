@@ -8,5 +8,6 @@ for skill in so-bug-review-interview so-build-feature-interview so-skills; do
 done
 
 cp "$project_root/shared/platform.example.md" "$project_root/so-init/platform.example.md"
+cp "$project_root/shared/guidebook.md" "$project_root/so-best-practice-audit/references/guidebook.md"
 
 printf 'Shared skill resources synchronized.\n'
