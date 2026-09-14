@@ -270,19 +270,101 @@ the whole plan to infer scope invite drift and skipped verification.
 **Rules:**
 
 1. **Stable exit invariant.** No phase may end with the branch in a known-broken state. Relevant
-   tests pass at every phase boundary — the only permitted red is the failing-tests-first phase,
-   whose deliverable *is* the red test — and exit criteria are demonstrated (a command, a test run,
-   an observable result), never merely asserted.
-2. **Cold-start scope.** Each phase names its own inputs and scope explicitly, so a fresh agent (or
-   human) can execute it from the phase block alone without re-deriving intent from the rest of the
-   plan. Anything ambiguous is called OUT of scope rather than left implicit.
-3. **One deliverable per phase.** A phase produces one concrete artifact or state change. If it
-   needs two unrelated deliverables, it is two phases.
-4. **Gates sit between phases, never inside them.** External gates (G1/G2/G3) and mandatory stops
-   are placed at phase boundaries, on a stable checkpoint, so a `revise` verdict never lands on a
-   half-finished phase.
-5. **Rollback captured before risky steps.** Any phase that touches PROD, a database, or another
-   irreversible surface records the reverse action in the Rollback plan before executing.
-6. **Tracker mirrors the plan.** The Phase & Gate Tracker rows are regenerated from these phase
-   titles (plus the gates) whenever the plan changes — the plan is the source, the tracker is the
-   status view.
+   tests/checks pass at phase exit and existing functionality remains intact — no phase relies on
+   the *next* phase to restore stability.
+2. **Red-test exception is transient only.** A bug fix may need to prove a regression test fails
+   *before* the fix. That red state must be captured and resolved *inside* one phase (show it fails
+   → apply the fix → it passes). A phase may go red mid-way, but **no phase may END red**.
+3. **Coarse, not tiny.** A phase is one focused work session with a clear checkpoint (e.g. "implement
+   feature + tests"), not a single line edit. Typical plans stay ~7–9 phases. The goal is stability
+   at each checkpoint, not maximal fragmentation.
+4. **Executable exit criteria.** "Verify it works" is not enough. Use concrete
+   commands/observations: the repo's test command → 0 failures; load the page and confirm the new
+   filter renders. Reference the Deploy-Surface Inventory and field-tested learnings from the
+   rollout phase's exit criteria rather than duplicating them (e.g. "deployed build == HEAD and real
+   behavior verified").
+5. **Tracker alignment.** The Phase & Gate Tracker (above) mirrors these generated phase titles plus
+   the external gates (G1/G2/G3) — it is the at-a-glance status view of the SAME phases, not a
+   competing fixed phase model. Keep tracker rows and generated phase titles in sync.
+
+**Well-formed example:**
+```markdown
+### Phase 3: Implement with tests-first
+**Objective:** Implement the feature with regression coverage using the repo's test runner.
+**Inputs:** Approved plan from Gate 1; discovery notes from Phase 1.
+**Scope:** Tests + implementation on the working branch. Excludes deploy/env validation (Phase 5).
+**Deliverable:** Feature code + tests; all tests passing locally.
+**Exit criteria:** the repo's test command exits 0; new tests cover the plan's acceptance criteria; no pre-existing tests skipped or weakened.
+```
+
+**Anti-pattern:** `3. Dev impl — write the code and some tests.` (no scope boundary, no inputs, and
+"some tests" is not an observable exit criterion — an agent cannot tell when this is done or stable).
+
+## Deploy-Surface Inventory & Rollout Safety
+
+*Canonical: Guidebook §2.6 (Rollout Inventory). Operational checklist below.*
+
+Before any PROD rollout, enumerate what actually ships and how — the "rollout" stage is where
+silent, half-deployed changes hide.
+
+> **Scales with the deploy.** The full ceremony below (execution-identity/ownership checks,
+> per-step rollback, live monitoring + stakeholder comms) gates a **PROD rollout**. A **LOCAL/DEV**
+> target that still deploys to a shared dev env keeps a **lightweight** inventory (changed artifacts
+> + deploy mechanism + any manual step); a purely local run (no deploy) has nothing to inventory.
+> Per Guidebook §2.6, do an inventory before *any* rollout — scale its depth to the target.
+
+- **Deploy-surface inventory.** List every changed artifact and its deploy mechanism: app bundle,
+  DB objects (procedures / tables / jobs / views), config/env, scheduled work. Different surfaces
+  deploy via different commands — e.g. an app-deploy command may NOT apply schema DDL. Anything not
+  covered by an automated deploy needs an explicit MANUAL step in the runbook.
+- **Execution identity + ownership.** State which identity runs each step and whether it has the
+  grants it needs on every touched object. For owner-executed objects, name the owner and confirm
+  the deploying identity can act as it — an identity mismatch surfaces only at run time.
+- **Verify the deployed build, then the behavior.** After deploying, confirm the target reports the
+  intended HEAD and that real behavior changed — not just "deploy succeeded." Prefer running deploys
+  in the foreground; backgrounded deploys can ship stale build metadata.
+- **Rollback plan per risky step.** For each DB-object or PROD step, capture the reverse action
+  (saved prior definition / inverse command) BEFORE executing, so a failure is recoverable.
+- **Monitor + notify for live/multi-tenant targets.** If the target is actively used by others, add
+  a post-deploy monitoring window and a stakeholder heads-up to the rollout/closeout stage.
+- **Post-merge hygiene.** Once merged, delete the merged feature branch (local `git branch -d` +
+  remote delete) unless the MR's "delete source branch" option already removed it. Keeps stale
+  branches from accumulating.
+
+## Field-Tested Learnings (verify, don't assume)
+
+Hard-won from real cycles — apply during Dev observe / Prod rollout:
+
+- **Verify deployed *behavior*, not "deploy succeeded."** Build/version endpoints and deploy
+  logs can report stale or misleading state. Confirm the change by observing real behavior on
+  the deployed env — a data value, a sort order, a rendered style — not the exit code.
+- **Run the app locally and inspect computed output before any deploy.** A CSS-specificity or
+  logic bug can pass typecheck + tests + build yet render wrong. Check the actual DOM/values.
+- **Run it before declaring it done.** A detailed spec and a green suite can both pass while the
+  workflow is broken end to end. Execute the real command or interaction.
+- **Know your smoke's auth model.** Strict smoke without a session cookie can fail/skip every
+  auth-gated check — a false negative. Verify via authenticated checks instead.
+- **DB object redeploys drop grants.** Recreating a procedure or view drops non-owner grants; the
+  scheduled executor identity then hits "unknown object" and the job auto-suspends. After any
+  redeploy, regrant and re-verify with the *actual* executor identity.
+- **Some failures only appear in prod-like data.** A metric can pass in one env and fail
+  transiently in another (timing/volume). Trigger the dependent job and re-check before
+  treating it as a defect.
+- **Keep the decision log current through every gate** — verdicts, revisions, deploy results,
+  and surprises. It is the audit trail.
+- **Guard tests must assert *runnable* artifacts, not string presence.** A test that greps for a
+  name can pass on a comment ("PROD block is identical…") while no runnable code exists. Assert the
+  real thing: an actual executable clause, N distinct blocks, a real branch — not a substring a
+  comment could satisfy.
+- **Prove a new test works by breaking it.** Remove the fix, confirm the test goes red, restore the
+  fix. A test that has never failed has not been shown to test anything.
+- **When a fix changes an artifact's *shape*, update sibling regression tests to preserve the
+  original invariant, not weaken it.** Switch an exact-string assertion to a pattern that still
+  proves the invariant, then re-confirm the guard still fails without the fix.
+- **Verify data repairs with before/after reconciliation over a window ≥ the correction window.**
+  Capture the gap set before, apply the repair, confirm zero after. Classify residual gaps as
+  *persistent* (older than the correction window → real recurrence / repair failed) vs
+  *transient* (within it → self-heals next cycle) so the recurrence check is low-noise.
+- **Check for precedent before improvising infrastructure fixes.** Network, proxy, and certificate
+  problems usually have an established in-house pattern. Search sibling repos before touching
+  certs, secrets, or trust stores.
