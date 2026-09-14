@@ -318,9 +318,11 @@ silent, half-deployed changes hide.
   deploy via different commands — e.g. an app-deploy command may NOT apply schema DDL. Anything not
   covered by an automated deploy needs an explicit MANUAL step in the runbook.
 - **Execution identity + ownership.** State which identity runs each step and whether it has the
-  grants it needs on every touched object. For owner-executed objects, name the owner and confirm
-  the deploying identity can act as it — an identity mismatch surfaces only at run time.
-- **Verify the deployed build, then the behavior.** After deploying, confirm the target reports the
+  privileges. For DB objects: recreate operations reset ownership; owner-executed objects need the
+  OWNER (not the caller's secondary roles) to hold the required grants. Restore ownership + regrant
+  after every recreate, and VERIFY with a real invocation — a lightweight check can pass while the
+  full path fails on an ownership/authorization gap.
+- **Verify deployed build == source and behavior.** Confirm the deployed version/commit equals the
   intended HEAD and that real behavior changed — not just "deploy succeeded." Prefer running deploys
   in the foreground; backgrounded deploys can ship stale build metadata.
 - **Rollback plan per risky step.** For each DB-object or PROD step, capture the reverse action
