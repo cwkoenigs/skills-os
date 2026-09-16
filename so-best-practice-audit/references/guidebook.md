@@ -617,3 +617,312 @@ Every repo that expects agent help SHOULD include `AGENTS.md`:
 ---
 
 ## 9. Security and Privacy
+
+### 9.1 Secure Defaults
+
+- Use least privilege.
+- Deny by default.
+- Validate untrusted input.
+- Use parameterized queries.
+- Protect secrets.
+- Encrypt restricted data in transit and at rest according to policy.
+- Maintain dependency inventory and patch vulnerable dependencies.
+- Log security-relevant events without exposing secrets.
+- Separate ownership identities from consumption identities; use service identities for pipelines
+  and services.
+- Tag restricted data and apply masking or row-level controls where the platform supports them.
+- Verify object ownership and grants after any recreate operation, and verify with a **real
+  invocation** using the intended executing identity — not only a compile or deploy check.
+
+The project's **restricted-data categories** (§1.1) are the input to every rule above. Define them
+once in `AGENTS.md` and reference them; do not restate them per workflow.
+
+### 9.2 Secrets
+
+Secrets MUST NOT appear in:
+
+- Git history.
+- Logs.
+- Test snapshots.
+- Prompt examples.
+- Notebooks.
+- Tickets.
+- Documentation screenshots.
+- Error messages.
+- Generated or committed config files. Gitignoring a source config is not sufficient if a generator
+  bakes the value into committed output.
+
+If a secret is exposed, rotate it and treat the repository/history as compromised until proven
+otherwise.
+
+### 9.3 Threat Modeling
+
+Threat model changes involving:
+
+- New external integrations.
+- New auth/authz behavior.
+- New restricted-data flow.
+- LLM/tool access to internal data.
+- Public-facing endpoints.
+- Privileged automation.
+- Data export.
+- Production write capability.
+
+Threat model output SHOULD include assets, actors, trust boundaries, abuse cases, controls, residual
+risks, and tests.
+
+### 9.4 AI-Specific Security
+
+LLM/agent workflows MUST consider:
+
+- Prompt injection.
+- Data exfiltration through tool calls.
+- Overbroad tool permissions.
+- Insecure generated code or queries.
+- Hallucinated procedures or policies.
+- Restricted-data leakage in prompts, outputs, logs, and evals.
+- Over-trust in confident but unsupported outputs.
+
+Controls SHOULD include tool allowlists, scoped credentials, output validation, permission-aware
+retrieval, human approval for destructive actions, and audit logs.
+
+---
+
+## 10. Testing and QA
+
+### 10.1 Risk-Based Test Mix
+
+Use the lowest-cost reliable test for the risk:
+
+| Test type | Purpose |
+|---|---|
+| Unit | Verify small logic in isolation. |
+| Component | Verify module behavior with controlled dependencies. |
+| Integration | Verify real boundaries such as database/API/tool calls. |
+| Contract | Verify producer/consumer schema and behavior. |
+| End-to-end | Verify critical user journeys. |
+| Data quality | Verify accuracy, freshness, uniqueness, completeness, validity. |
+| Security | Verify access control, input handling, dependency risk. |
+| Accessibility | Verify keyboard and assistive technology behavior. |
+| Performance | Verify latency, throughput, cost, and scaling assumptions. |
+| LLM eval | Verify prompt/model behavior against expected outcomes. |
+
+### 10.2 Required Test Considerations
+
+Tests SHOULD cover:
+
+- Happy path.
+- Boundary values.
+- Null/empty input.
+- Invalid input.
+- Permission failures.
+- Dependency failures.
+- Retry behavior.
+- Duplicate input.
+- Out-of-order input.
+- Backfill/reprocessing.
+- Migration/rollback.
+- Observability evidence.
+
+Bug fixes SHOULD include a regression test that fails before the fix and passes after the fix.
+Capture the failing evidence in the decision log when practical.
+
+### 10.3 Tests Must Assert Runnable Behavior
+
+A test that greps for a string can pass on a comment while no working code exists. Assert the real
+artifact: an executable branch, a parsed structure, an actual invocation — not a substring that
+prose could satisfy.
+
+**Prove a new test works by breaking it.** A test that has never failed has not been shown to test
+anything. Temporarily remove the fix, confirm the test goes red, restore the fix.
+
+**Run the thing before declaring it done.** A passing suite is not evidence that the workflow works
+end to end. Execute the actual command, script, or interaction.
+
+### 10.4 QA Evidence Package
+
+For material releases, QA evidence SHOULD include:
+
+- Test plan and results.
+- Known defects.
+- Risk acceptance.
+- Screenshots or recordings for UX-critical flows.
+- Data reconciliation outputs for data changes.
+- Security review notes where applicable.
+- Approval record.
+
+---
+
+## 11. CI/CD and Release Management
+
+### 11.1 CI Minimum Gates
+
+CI SHOULD run:
+
+- Formatting check.
+- Lint/static analysis.
+- Type checks where applicable.
+- Unit tests.
+- Integration tests for changed boundaries.
+- Security/dependency scans.
+- Query or schema validation where applicable.
+- LLM prompt/eval tests when prompt behavior changes.
+- Documentation checks for required files.
+- **Generated-artifact freshness** — if the repo generates committed files, CI MUST prove the
+  committed copies match a fresh run of the generator.
+
+**Enforce in CI what you would otherwise write down as "remember to."** A documented manual step is
+a known drift hazard; a CI check is a guarantee. Prefer deriving lists from the filesystem over
+maintaining parallel hand-written registries.
+
+Run the repo's own checks locally before pushing.
+
+### 11.2 Deployment Standards
+
+- Deployments MUST be repeatable.
+- Infrastructure and database changes SHOULD be scripted.
+- Manual steps MUST be documented and minimized.
+- Production deploys MUST have rollback or remediation notes.
+- Feature flags SHOULD be used for risky changes when feasible.
+- Post-deploy verification MUST prove the deployed system changed as intended.
+
+### 11.3 Database Migration Standards
+
+Migrations SHOULD be:
+
+- Versioned.
+- Ordered.
+- Repeat-safe.
+- Tested in lower environments.
+- Backward-compatible where possible.
+- Paired with rollback or forward-fix strategy.
+- Audited after execution.
+
+Avoid destructive migrations without backup/clone strategy, consumer impact analysis, approval,
+communication plan, and recovery plan.
+
+---
+
+## 12. Error Handling
+
+### 12.1 Error Categories
+
+Standardize errors into categories:
+
+- Validation.
+- Authentication.
+- Authorization.
+- Not found.
+- Conflict.
+- Rate limited.
+- Dependency failure.
+- Timeout.
+- Data quality failure.
+- Internal error.
+
+### 12.2 User-Facing Errors
+
+User-facing errors SHOULD:
+
+- Explain what happened.
+- Explain what the user can do next.
+- Avoid exposing internals.
+- Preserve user input.
+- Provide a correlation ID for support.
+- Avoid blame language.
+
+### 12.3 Internal Errors
+
+Internal errors SHOULD include:
+
+- Correlation ID.
+- Error category.
+- Component.
+- Operation.
+- Relevant non-sensitive context.
+- Stack trace where appropriate and protected.
+- Retryability.
+
+---
+
+## 13. Code Review Standards
+
+Reviewers SHOULD evaluate:
+
+- Correctness and stated intent vs actual diff.
+- Simplicity and maintainability.
+- Test coverage and validation evidence.
+- Restricted-data, privacy, and security posture.
+- Idempotency and retry safety.
+- Error handling and observability.
+- Data quality and semantic definitions.
+- Performance and compute cost.
+- UX and accessibility.
+- Backward compatibility.
+- Rollback/remediation.
+- Documentation and runbook updates.
+
+### 13.1 Pull Request Template
+
+```markdown
+## Summary
+What changed and why?
+
+## Scope
+- [ ] Application code
+- [ ] Database/data platform
+- [ ] Infrastructure
+- [ ] UX
+- [ ] LLM/prompt/agent behavior
+- [ ] Documentation
+
+## Data Classification / Privacy
+- Restricted data: <No | Yes | Unsure treated as Yes>
+- Review track: <Internal + external | Internal-only>
+- Decision log:
+
+## User-Visible Behavior Changes
+- <none | list approved changes>
+
+## Validation
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Data quality checks
+- [ ] Security checks
+- [ ] Accessibility checks
+- [ ] LLM evals
+- [ ] Manual QA
+
+## Deploy Surface
+- App/service:
+- Data objects:
+- Config/env:
+- Manual steps:
+- Execution identity / owner:
+
+## Operational Impact
+- [ ] Logs/metrics updated
+- [ ] Dashboard/alert updated
+- [ ] Runbook updated
+- [ ] Rollback/remediation documented
+
+## Notes for Reviewer
+Known tradeoffs, limitations, or follow-up work.
+```
+
+---
+
+## 14. Templates
+
+### 14.1 ADR Template
+
+```markdown
+# ADR: <Decision title>
+
+## Status
+Proposed | Accepted | Deprecated | Superseded
+
+## Date
+YYYY-MM-DD
+
+## Context
