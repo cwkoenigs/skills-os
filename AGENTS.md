@@ -1,7 +1,8 @@
 # Working in skills-os
 
-This repository contains reusable skills. See [shared/guidebook.md](shared/guidebook.md)
-for the layout and build command.
+This repository contains reusable skills. See [README.md](README.md) for the layout
+and build command, and [shared/guidebook.md](shared/guidebook.md) for the
+Software Project Best Practices Guidebook the cadence skills follow.
 
 - Keep each skill's name and description in its `SKILL.md` YAML frontmatter.
 - Keep workflow instructions focused on the skill's stated purpose.
