@@ -310,3 +310,310 @@ Production repositories SHOULD include:
 - `AGENTS.md` when agents are expected to work in the repo.
 - `RUNBOOK.md` for operational workflows.
 - Test, lint, typecheck, and build commands.
+- Deploy instructions and environment mapping.
+- Security/privacy notes, including the project's restricted-data categories (§1.1).
+- Data dictionary, semantic model, or catalog link for data projects.
+- Decision logs, ADRs, or a link to the central decision-log directory.
+
+---
+
+## 5. Architecture and Abstraction
+
+### 5.1 Boundaries
+
+- Separate domain logic from transport, storage, UI, and platform adapters.
+- Keep dependency direction explicit and avoid cycles.
+- Access external systems through adapters or shared clients, not scattered direct calls.
+- Standardize cross-cutting concerns: auth, query execution, caching, error handling, logging,
+  telemetry, and configuration.
+
+### 5.2 DRY, WET, and AHA
+
+DRY means do not duplicate knowledge, policy, and business logic. It is appropriate for:
+
+- Authentication and authorization.
+- Data access helpers.
+- Logging and telemetry.
+- Design tokens and shared UI.
+- Security controls.
+- Stable business metric definitions.
+- Tested prompt templates and skill patterns.
+
+WET is acceptable when the domain is still changing:
+
+- Prototypes.
+- Unproven prompts.
+- Early UX workflows.
+- One-off data remediation scripts.
+- Business rules likely to diverge.
+
+Create a shared abstraction only when:
+
+- The duplicated behavior is stable.
+- At least three uses exist or are clearly imminent.
+- Tests exist.
+- Ownership and versioning are clear.
+- The abstraction reduces complexity instead of hiding it.
+
+### 5.3 Shared Internal Packages
+
+When the organization maintains shared packages for platform access, auth, design tokens, or UI
+components, new projects SHOULD use them rather than reimplementing the same concerns. Record the
+canonical package list in `AGENTS.md` so agents and new contributors find it without asking.
+
+Reciprocally: when a project hand-rolls something a shared package already covers, that is a
+finding, not a style preference.
+
+### 5.4 Data and Interface Contracts
+
+Production datasets and published interfaces SHOULD define:
+
+- Owner.
+- Source system.
+- Grain — what one row or one record represents.
+- Primary key or uniqueness rule.
+- Freshness expectation.
+- Retention requirement.
+- Sensitive fields and classification.
+- Allowed consumers.
+- Quality checks.
+- Backfill behavior.
+- Breaking change policy.
+- Operational dashboard or validation query.
+
+Transformation rules that apply regardless of engine:
+
+- Transformations MUST be deterministic unless nondeterminism is explicitly required.
+- Use explicit column/field lists for production interfaces; avoid `SELECT *` or equivalent
+  wildcard projection in stable published interfaces.
+- Avoid hidden ordering assumptions.
+- Every incremental model MUST define deduplication and late-arriving-data behavior.
+- Windowed logic MUST anchor on fixed calendar/clock boundaries when the business definition is
+  calendar-based. Do not infer "recent" solely from the newest available data row.
+
+Consume telemetry and shared datasets through **stable curated views or documented interfaces**, not
+raw internal tables. This gives consumers a contract and isolates them from schema churn.
+
+---
+
+## 6. Idempotency and Resilience
+
+### 6.1 Idempotency
+
+Any retryable operation MUST be safe to retry or explicitly documented as not retryable.
+
+Patterns:
+
+- API calls use idempotency keys.
+- Database writes use unique keys, upserts, transactional merges, or batch IDs.
+- Pipelines use watermarks and checkpoints.
+- Notifications record send history.
+- Migrations record applied versions.
+- Agent work happens on branches/worktrees and requires explicit human merge.
+
+### 6.2 Retry Taxonomy
+
+| Error type | Retry? | Pattern |
+|---|---|---|
+| Validation error | No | Fail fast with actionable error. |
+| Auth/authz error | No | Fail closed; alert if unexpected. |
+| Not found | Sometimes | Retry only if eventual consistency is expected. |
+| Rate limit | Yes | Exponential backoff with jitter. |
+| Network timeout | Yes | Bounded retry with idempotency key. |
+| Deadlock/lock timeout | Yes | Bounded retry; monitor frequency. |
+| Data quality failure | No automatic publish | Quarantine and alert. |
+| Unknown exception | Limited | Retry only if the operation is idempotent. |
+
+### 6.3 Fail Safely
+
+- Security failures MUST fail closed.
+- Data quality failures MUST prevent material bad data from publishing.
+- User-facing applications SHOULD degrade gracefully instead of showing misleading results.
+- Agents MUST stop or ask for review when a task exceeds authorized scope.
+
+---
+
+## 7. Observability and Operations
+
+### 7.1 Required Telemetry Fields
+
+Production workflows SHOULD emit:
+
+- `request_id` or `correlation_id`.
+- `run_id` or `batch_id`.
+- Environment.
+- Version or commit SHA.
+- Actor or service account.
+- Start and end time.
+- Status.
+- Input count and output count.
+- Failure count and error category.
+- Retry count.
+- Compute and cost indicators where available.
+
+### 7.2 Logging
+
+Logs MUST be:
+
+- Structured where possible.
+- Redacted for secrets and restricted data.
+- Queryable by correlation ID.
+- Actionable for operations.
+- Retained according to policy.
+
+Logs MUST NOT include passwords, API keys, tokens, private keys, unmasked restricted data, or
+unnecessary raw LLM prompt/output payloads.
+
+### 7.3 Dashboards and Alerts
+
+Dashboards SHOULD answer:
+
+- Is it running?
+- Is it correct?
+- Is it fresh?
+- Is it fast enough?
+- Is it within cost expectations?
+- What changed recently?
+- Who owns it?
+- What should operations do next?
+
+Alerts MUST be actionable and routed to an owner.
+
+**Prefer event-driven monitoring over polling.** Reactive work — pipeline monitoring, alerting,
+downstream reactions to new data — SHOULD be triggered by a change event rather than a tight polling
+loop. Polling burns compute on empty executions and can miss fast transitions. Scheduled jobs are
+for work that genuinely runs on a calendar.
+
+- SHOULD NOT run a job on a tight schedule purely to detect changes.
+- SHOULD NOT create per-entity alert objects that poll a shared table. Prefer one handler with a
+  filter; add an entity by editing the filter, not by adding infrastructure.
+- Record the platform's concrete event-trigger mechanism in the §17 appendix so this rule is
+  actionable rather than aspirational.
+
+### 7.4 Data Quality
+
+Production datasets SHOULD have checks proportional to business impact:
+
+- Row count and freshness.
+- Required-field null checks.
+- Duplicate checks.
+- Accepted values.
+- Referential integrity.
+- Future timestamp checks.
+- Distribution/anomaly checks.
+- Source-to-target reconciliation.
+
+Material quality failures SHOULD write evidence to an operational table and alert an owner.
+
+---
+
+## 8. LLM and Agent Standards
+
+### 8.1 Allowed Uses
+
+LLMs MAY be used for classification, extraction, summarization, translation, documentation drafting,
+code review assistance, query generation with guardrails, semantic Q&A over governed data, and
+agentic task execution in controlled environments.
+
+LLMs MUST NOT be used as unreviewed final authority for:
+
+- Security-sensitive access decisions.
+- Clinical, legal, financial, or compliance determinations.
+- Destructive production operations.
+- Unverified data modification.
+- Silent policy exceptions.
+
+### 8.2 Prompt and Skill Contracts
+
+Production prompts and reusable skills SHOULD define:
+
+- Purpose and owner.
+- Trigger conditions and non-goals.
+- Input and output schema.
+- Safety rules and refusal conditions.
+- Model/function target when relevant.
+- Evaluation set or review method.
+- Changelog.
+
+Skill descriptions SHOULD be short, action-oriented, and placed in YAML frontmatter. Update the
+README table and installation script when adding or renaming shared skills.
+
+New or refactored skills MUST be authored via the native `skill-development` skill
+(`$skill-development`) before hand-writing a `SKILL.md`; it is the canonical authoring gate. Before
+authoring any skill, confirm the need is not already met by a native skill or an existing shared
+skill (see §1.2).
+
+### 8.3 Structured Outputs
+
+LLM outputs used by systems SHOULD be structured and validated:
+
+- JSON schema or equivalent.
+- Strict field names.
+- Allowed categorical values.
+- Refusal/error format.
+- No downstream execution of unvalidated free text.
+
+### 8.4 LLM Evaluation
+
+Before production use, LLM workflows SHOULD have:
+
+- Golden examples.
+- Edge cases.
+- Prompt-injection/adversarial cases.
+- Regression tests for prompt or model changes.
+- Schema validation.
+- Human review sampling.
+- Accuracy and failure thresholds.
+- Drift monitoring.
+
+### 8.5 Agent Autonomy Levels
+
+| Level | Description | Production use |
+|---|---|---|
+| 0 | Suggest only | Safe default. |
+| 1 | Draft artifacts | Allowed with human review. |
+| 2 | Modify non-production files | Allowed with tests and review. |
+| 3 | Open PRs or change requests | Allowed with human approval before merge. |
+| 4 | Execute production changes | Requires scoped permissions, audit, rollback, and explicit approval. |
+| 5 | Autonomous production operation | Generally prohibited unless approved for a narrow, low-risk workflow. |
+
+### 8.6 Agent Repository Instructions
+
+Every repo that expects agent help SHOULD include `AGENTS.md`:
+
+```markdown
+# AGENTS.md
+
+## Project Overview
+
+## Architecture Boundaries
+
+## Directory Map
+
+## Setup
+
+## Required Checks
+
+## Coding Standards
+
+## Testing Standards
+
+## Security and Privacy Rules
+- Restricted-data categories for this project (Guidebook §1.1):
+
+## Data Rules
+
+## UX Rules
+
+## Files Requiring Extra Care
+
+## PR Response Format
+- Summary
+- Tests run
+- Risks/limitations
+- Files changed
+```
+
+---
+
+## 9. Security and Privacy
