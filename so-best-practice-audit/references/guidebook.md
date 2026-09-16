@@ -926,3 +926,221 @@ Proposed | Accepted | Deprecated | Superseded
 YYYY-MM-DD
 
 ## Context
+What problem are we solving? What constraints matter?
+
+## Decision
+What did we decide?
+
+## Alternatives Considered
+1. Option A
+2. Option B
+3. Option C
+
+## Consequences
+Positive, negative, operational, security, cost, maintenance.
+
+## Validation
+How will we know the decision worked?
+
+## Review Date
+YYYY-MM-DD
+```
+
+### 14.2 Data Contract Template
+
+```markdown
+# Data Contract: <Dataset name>
+
+## Owner
+
+## Purpose
+
+## Source Systems
+
+## Grain
+One row represents...
+
+## Primary Key / Uniqueness Rule
+
+## Freshness Expectation
+
+## Retention
+
+## Sensitive Fields
+
+## Tags / Classification
+
+## Schema
+| Column | Type | Required | Description | Quality rule |
+|---|---|---:|---|---|
+
+## Quality Checks
+
+## Consumers
+
+## Breaking Change Policy
+
+## Backfill / Reprocessing Behavior
+
+## Operational Dashboard or Query
+```
+
+### 14.3 Runbook Template
+
+```markdown
+# Runbook: <System/workflow>
+
+## Owner
+
+## Purpose
+
+## Architecture Summary
+
+## Dependencies
+
+## Normal Schedule / Trigger
+
+## Dashboard / Operational Queries
+
+## Alert Conditions
+
+## Common Failure Modes
+| Symptom | Likely cause | Action | Escalation |
+|---|---|---|---|
+
+## Retry Procedure
+
+## Rollback / Remediation
+
+## Data Reconciliation
+
+## Communication Plan
+
+## Last Reviewed
+YYYY-MM-DD
+```
+
+### 14.4 Prompt Card Template
+
+```markdown
+# Prompt Card: <Prompt name>
+
+## Owner
+
+## Use Case
+
+## Model / Function Target
+
+## Autonomy Level
+0 | 1 | 2 | 3 | 4 | 5
+
+## Input Schema
+
+## Output Schema
+
+## Prompt Version
+
+## Prompt Text
+
+## Examples
+
+## Refusal / Safety Rules
+
+## Evaluation Dataset
+
+## Metrics
+
+## Known Limitations
+
+## Monitoring
+
+## Changelog
+```
+
+---
+
+## 15. Compliance Rubric
+
+Use this scoring model in project reviews.
+
+| Area | 0 | 1 | 2 | 3 |
+|---|---|---|---|---|
+| Requirements | Undefined | Partial | Clear | Clear, testable, traceable |
+| Data classification / privacy | Not classified | Informal | Classified and recorded | Corroborated, auditable, enforced |
+| Architecture | Ad hoc | Some boundaries | Documented | Documented with ADRs and failure modes |
+| Idempotency | Unsafe | Partial | Mostly retry-safe | Retry-safe with evidence |
+| Testing | Manual only | Basic automated | Good coverage | Risk-based, automated, traceable |
+| Observability | Minimal | Logs only | Logs plus metrics | Logs, metrics, dashboards, alerts |
+| Security | Not reviewed | Basic review | Controls applied | Threat modeled and verified |
+| Data quality | None | Ad hoc checks | Standard checks | Automated checks with alerts and evidence |
+| UX | Developer-centric | Basic usable | User-tested | Accessible, observable, error-resilient |
+| LLM/agent control | Uncontrolled | Manual review | Versioned prompts/tools | Evaluated, monitored, permissioned |
+| CI enforcement | None | Manual checklist | CI runs tests | CI enforces generated artifacts and registries |
+| Maintainability | High burden | Some docs | Clear docs | Low operational burden, clear ownership |
+
+Production readiness target: no category below 2. High-risk systems should target 3 in data
+classification/privacy, security, observability, idempotency, and testing.
+
+---
+
+## 16. Review Cadence
+
+Review this guide:
+
+- Quarterly.
+- After major incidents.
+- After material platform changes.
+- After adopting new agent capabilities.
+- After audit findings.
+- When repeated review comments reveal a missing standard.
+
+Each review SHOULD produce:
+
+- Added standards.
+- Removed obsolete standards.
+- Clarified ambiguous standards.
+- Updated templates.
+- Updated enforcement checks.
+
+---
+
+## 17. Platform Standards (project-defined, external to this file)
+
+This guide is stack-agnostic by design, and **this file is never edited by an adopting project** —
+that is what keeps it upgradable. Concrete platform rules live in a separate, project-owned
+document:
+
+```
+shared/platform.md          <- yours; no two projects share it
+shared/platform.example.md  <- the template it is copied from
+```
+
+Run `/so-init` to be interviewed and have it written, or copy the template and fill it in by hand.
+
+**Seven sections, in `platform.md`:** environment separation · event-trigger mechanism · deploy
+commands (and what each does *not* cover) · data classification tooling · shared internal packages ·
+reference implementations · project-specific additions.
+
+**Rules in this guide that stay principles until `platform.md` answers them:**
+
+| Guidebook rule | Needs |
+|---|---|
+| §2.2 classification corroboration | Data classification tooling |
+| §5.3 use shared packages | Shared internal packages |
+| §7.3 event-triggered, not polled | Event-trigger mechanism |
+| §11.2 post-deploy verification | Deploy commands |
+
+An absent or empty `platform.md` is reported as a finding by `so-best-practice-audit` rather than
+silently passing. The system fails honestly instead of inventing platform mechanics it cannot know.
+
+### 17.1 Source Anchors to Verify Periodically
+
+Verify current vendor and standards documentation for:
+
+- The platform's data classification, masking, and access-control features.
+- The platform's scheduling, event, and pipeline primitives.
+- The platform's deploy tooling and CLI behavior.
+- Agent/skill authoring and installation behavior for the agent runtime in use.
+- The external review CLI and its `AGENTS.md` conventions.
+- NIST Secure Software Development Framework.
+- OWASP ASVS and OWASP Top 10.
