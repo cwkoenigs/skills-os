@@ -1,3 +1,5 @@
+<!-- GENERATED FILE — do not edit. Source: shared/cadence-core.md. Run ./build.sh to regenerate. -->
+
 # Review Cadence Core
 
 Shared **operational profile** of the Software Project Best Practices Guidebook, for

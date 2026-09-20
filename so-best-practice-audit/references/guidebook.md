@@ -1,3 +1,5 @@
+<!-- GENERATED FILE — do not edit. Source: shared/guidebook.md. Run ./build.sh to regenerate. -->
+
 # Software Project Best Practices Guidebook
 
 **Version:** 1.0
@@ -681,7 +683,7 @@ LLM/agent workflows MUST consider:
 - Insecure generated code or queries.
 - Hallucinated procedures or policies.
 - Restricted-data leakage in prompts, outputs, logs, and evals.
-- Over-trust in confident but unsupported outputs.
+- Over-trust in confident but unsupported output.
 
 Controls SHOULD include tool allowlists, scoped credentials, output validation, permission-aware
 retrieval, human approval for destructive actions, and audit logs.

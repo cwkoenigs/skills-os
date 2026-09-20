@@ -1,3 +1,5 @@
+<!-- GENERATED FILE — do not edit. Source: shared/platform.example.md. Run ./build.sh to regenerate. -->
+
 # Project platform
 
 Copy and adapt this template when documenting a project's platform. Replace
