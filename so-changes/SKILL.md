@@ -137,3 +137,68 @@ Write `docs/insights/<kebab-slug>.md`:
 
 ```markdown
 # <Insight title>
+
+## The pattern
+<one paragraph>
+
+## Evidence
+- <case 1 — repo/date/what happened>
+- <case 2 — ...>
+
+## What to do about it
+<the actionable rule>
+```
+
+### 5c: Human-glance gate
+**⚠️ STOP:** Show the draft and get confirmation before writing. Insights become team guidance; a
+wrong one is worse than none.
+
+### 5d: Promote if it is really a standard
+If the insight is a rule the team should be held to rather than a note, it belongs in
+`shared/guidebook.md`, not `docs/insights/`. Say so and offer to route it through `/so-skills`
+(which owns guidebook changes and the `build.sh` regeneration that follows).
+
+## ADR Template
+
+```markdown
+# ADR-<NNN>: <Decision title>
+
+## Status
+Proposed | Accepted | Deprecated | Superseded by ADR-<NNN>
+
+## Date
+YYYY-MM-DD
+
+## Context
+What problem are we solving? What constraints matter?
+
+## Options Considered
+1. **<Option A>** — <why it lost, or "chosen">
+2. **<Option B>** — <why it lost>
+
+## Decision
+What did we decide?
+
+## Consequences
+Positive, negative, operational, security, cost, maintenance.
+
+## Validation
+How will we know the decision worked?
+
+## Review Date
+YYYY-MM-DD
+```
+
+## Notes
+
+- **Never invent history.** If you cannot establish what happened from the conversation, git, or the
+  existing docs, ask. A plausible-sounding fabricated ADR is a liability.
+- **One artifact per invocation.** Chain offers are offers; do not write four files because the modes
+  are adjacent.
+- Guidebook §3 owns the decision-log format used by the cadence skills; this skill owns ADRs,
+  changelog, announcements, releases, and insights. They are complementary, not duplicates.
+
+## Output
+
+One of: a numbered ADR, a changelog entry, a saved announcement draft, a cut release, or an insight
+doc — plus a single chain offer.
