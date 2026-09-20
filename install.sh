@@ -215,18 +215,18 @@ entry = next((r for r in remotes
 
 if entry is None:
     remotes.append({'source': source, 'ref': ref, 'skills': skills})
+    print('Added skill-os remote with %d skills.' % len(skills))
 else:
-    # NOTE: lines from here to the end of the file are a provisional completion, not a
-    # transcription. The source screenshots stopped at the `remotes.append(...)` line above.
-    # Replace with the original when available.
     have = {s.get('name') for s in entry.setdefault('skills', [])}
-    for s in skills:
-        if s['name'] not in have:
-            entry['skills'].append(s)
+    added = [s for s in skills if s['name'] not in have]
+    entry['skills'].extend(added)
+    print('skill-os remote present; added %d missing skill(s): %s'
+          % (len(added), [s['name'] for s in added] or 'none'))
 
 with open(path, 'w') as f:
     json.dump(config, f, indent=2)
     f.write('\n')
+print('Wrote %s' % path)
 PY
 
-echo "Installed into $CONFIG: $REMOTE_SOURCE@$REF with ${#skills[@]} skill(s)."
+echo "Restart the agent to load the new skills."
