@@ -136,3 +136,40 @@ and the extra fields: `Symptom`, `Root cause`, `Regression window`, `Sibling occ
 **⚠️ MANDATORY STOP:** Present the fix plan + decision-log path and get approval before handoff.
 
 ### Step 6: Handoff
+
+- If the review track includes external review: ask the developer to confirm, then run gate G1 via
+  `/so-codex-review` (mode `plan`), passing `restricted`, `review_track`, and `risk`. On no, hand the
+  plan over for manual review.
+- If internal-only: proceed to execution within the agent per the approved plan.
+
+This skill ends at handoff — the fix is applied by the normal agent flow, not here.
+
+## Bug-specific field-tested learnings
+
+Hard-won from real bug cycles (in addition to the shared learnings in `cadence-core.md`):
+
+- **Anchor windowed bucketing on a fixed calendar/clock boundary, never on data presence.**
+  Both "position slicing" (take the newest N active rows) and "anchor on the latest active row"
+  silently recreate window-edge bugs for sparse or all-old-data users — old activity gets
+  mislabeled as recent. Derive the window from a fixed clock/calendar, then do date-only math.
+- **Edge cases ARE part of the blast radius — enumerate and test them.** For any windowed or
+  aggregating fix, explicitly cover: sparse data, all-old data, empty, single item, and
+  calendar/timezone/DST boundaries. "Tests green" on the happy path is not done; reviewers will
+  (rightly) find the sparse/all-old case.
+- **Expect iterative review to surface latent edges.** A single fix often masks a second-order
+  bug in the same area (e.g. fixing ordinal slicing revealed anchor-on-data). Treat each review
+  round's finding as a prompt to re-scan the blast radius, not just patch the one line.
+- **A green suite is not a reproduction.** If the tests passed before the fix and after, the test
+  does not cover the bug. Go back to Step 3.
+
+## Stopping Points
+
+- ✋ Step 2: after data classification / review-track acknowledgement
+- ✋ Step 3: after reproduction (or accepted rationale for an unreproduced bug)
+- ✋ Step 5: after fix plan + decision log presented, before handoff
+
+## Output
+
+A review-ready phased fix plan following the shared cadence — grounded in a reproduction, a named
+root cause, a blast-radius list, and a failing-first regression test — plus a persisted decision-log
+artifact.
