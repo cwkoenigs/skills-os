@@ -1,3 +1,5 @@
+<!-- GENERATED FILE — do not edit. Source: shared/guidebook.md. Run ./build.sh to regenerate. -->
+
 # Software Project Best Practices Guidebook
 
 **Version:** 1.0
