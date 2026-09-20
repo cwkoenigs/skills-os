@@ -1,4 +1,4 @@
-<!-- GENERATED FILE — do not edit. Source: shared/platform.notconfigured.md. Run ./build.sh to regenerate. -->
+<!-- GENERATED FILE — do not edit. Source: none (shared/platform.md absent). Run ./build.sh to regenerate. -->
 
 # Platform Standards — NOT CONFIGURED
 

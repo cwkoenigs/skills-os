@@ -34,8 +34,8 @@ The script copies `shared/cadence-core.md` into `so-bug-review-interview/`,
 `shared/platform.example.md` into `so-init/` and `shared/guidebook.md` into
 `so-best-practice-audit/references/`. It also bundles the project's platform
 standards into that references directory: `shared/platform.md` when the project
-has written one, otherwise the `shared/platform.notconfigured.md` stub so the
-audit reports the gap instead of guessing. Each copy starts with a `GENERATED FILE` banner naming its source. Edit the
+has written one, otherwise a NOT CONFIGURED stub so the audit reports the gap
+instead of guessing. Each copy starts with a `GENERATED FILE` banner naming its source. Edit the
 shared source files and rerun the script; changes made directly to those copies
 will be overwritten.
 
