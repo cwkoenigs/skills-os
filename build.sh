@@ -21,4 +21,13 @@ done
 generate shared/platform.example.md so-init/platform.example.md
 generate shared/guidebook.md so-best-practice-audit/references/guidebook.md
 
+# The audit skill needs the project's own platform standards. Bundle them when
+# the project has written shared/platform.md; otherwise bundle the
+# NOT CONFIGURED stub so the audit reports the §17 gap instead of guessing.
+if [ -f "$project_root/shared/platform.md" ]; then
+  generate shared/platform.md so-best-practice-audit/references/platform.md
+else
+  generate shared/platform.notconfigured.md so-best-practice-audit/references/platform.md
+fi
+
 printf 'Shared skill resources synchronized.\n'

@@ -8,7 +8,7 @@ shows file names only; the Markdown contains starter guidance to customize.
 | Path | Purpose |
 | --- | --- |
 | `docs/adr/` | Architecture decision records |
-| `shared/` | Source files for common guidance and templates |
+| `shared/` | Source files for common guidance and templates (`platform.md` is project-owned and gitignored) |
 | `so-best-practice-audit/` | Review a project against relevant practices |
 | `so-bug-review-interview/` | Clarify and investigate a reported bug |
 | `so-build-feature-interview/` | Turn a feature request into an implementation brief |
@@ -32,7 +32,10 @@ Run from the repository root:
 The script copies `shared/cadence-core.md` into `so-bug-review-interview/`,
 `so-build-feature-interview/`, and `so-skills/`. It also copies
 `shared/platform.example.md` into `so-init/` and `shared/guidebook.md` into
-`so-best-practice-audit/references/`. Each copy starts with a `GENERATED FILE` banner naming its source. Edit the
+`so-best-practice-audit/references/`. It also bundles the project's platform
+standards into that references directory: `shared/platform.md` when the project
+has written one, otherwise the `shared/platform.notconfigured.md` stub so the
+audit reports the gap instead of guessing. Each copy starts with a `GENERATED FILE` banner naming its source. Edit the
 shared source files and rerun the script; changes made directly to those copies
 will be overwritten.
 
