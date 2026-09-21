@@ -62,4 +62,129 @@ Scan the repo root and one level down for:
 | `README.md`, existing `RUNBOOK.md` | environments, deploy steps, owners |
 
 Also check: `git remote -v` (this identifies the **git host**, which decides the CI provider in
-Step 5 — `github.com` → Actions, a GitLab host → GitLab CI, `bitbucket.org` → Pipelines.
+Step 5 — `github.com` → Actions, a GitLab host → GitLab CI, `bitbucket.org` → Pipelines, no remote →
+offer a local hook), and whether CI config and deploy config disagree about commands — that
+disagreement is worth surfacing.
+
+**Report the detection before interviewing.** State what you found, what you inferred, and what you
+could not determine. Present inferences as inferences.
+
+### Step 2: Interview the gaps only
+
+Use the question tool. Ask about what detection could not settle; confirm inferences in bulk rather
+than one at a time. Order matters — start with what you know least.
+
+Cover the seven `platform.md` sections. Two deserve extra care:
+
+- **Deploy commands (§3)** — the *"does NOT cover"* column is the point of the table, and nobody
+  volunteers it. Ask directly: *"When you run `<detected deploy command>`, what does it NOT apply?
+  Schema migrations? Secrets? Grants? Scheduled jobs?"* Half-deployed changes hide precisely here.
+  If migrations live in a separate directory from the app, that is almost always a second deploy
+  path — confirm it.
+- **Event-trigger mechanism (§2)** — ask what runs work when data changes, and what is *legitimately*
+  scheduled on a calendar. If the honest answer is "we poll today," record that as the current state
+  plus the intended target; do not write an aspiration as if it were the standard.
+
+**"None" and "not available" are valid answers** for shared packages, classification tooling, and
+reference implementations. Record them explicitly. An honest "none" stops the audit from inventing
+one; a vague placeholder is worse than an empty section because it looks configured.
+
+### Step 3: Interview the restricted-data categories
+
+Guidebook §1.1 is unenforceable until this is answered, and it decides whether external review is
+ever permitted (`so-codex-review` refuses on anything but a clear).
+
+Ask which categories apply, and for each one that does, what it concretely means here:
+
+| Category | Examples |
+|---|---|
+| Personal data | names, addresses, emails, phone, national identifiers, dates of birth |
+| Regulated data | health records, payment-card data, financial account data |
+| Customer-confidential | customer-owned data held under contract |
+| Company-confidential | credentials, tokens, internal hostnames, unreleased plans, security findings |
+
+A project with **no** restricted exposure records that explicitly — it does not skip the gate. Note
+the practical consequence in the file: if nothing is restricted, the gate normally clears and
+external review is available; if something is, say which workflows it blocks.
+
+**⚠️ STOP:** Present the drafted `platform.md` and the restricted-data block for review before
+writing. These become the standard the audit skill enforces; a wrong answer here is worse than an
+empty one, because it will be cited as settled.
+
+### Step 4: Write the platform + agent files
+
+On approval:
+
+1. **`shared/platform.md`** — from the vendored template's structure. Fill the `**Project:**`,
+   `**Stack:**`, and `**Last reviewed:**` header. Keep each section's `*Referenced by Guidebook §X*`
+   line so the traceability survives. Strip the template's instructional `<!-- -->` guidance
+   comments; keep your answers as prose and tables. Delete a section only if the user said it does
+   not apply, and say why inline.
+2. **`AGENTS.md`** — insert or replace a `## Security and Privacy Rules` subsection containing the
+   restricted-data table and its consequence. **Preserve every other section.** If `AGENTS.md` does
+   not exist, create it using the Guidebook §8.6 template.
+3. Run `./build.sh` so `platform.md` is vendored into `so-best-practice-audit/references/` (this
+   replaces the NOT-CONFIGURED stub).
+
+### Step 5: Generate the CI config for the detected provider
+
+The checks themselves live in `tests/verify.sh` — one runner, provider-agnostic. A CI config is a
+thin wrapper around it, so it is generated per-environment rather than shipped.
+
+1. **Resolve the provider** from the Step 1 detection, in this order:
+   - An existing CI config in the repo → that provider. **Do not overwrite it**; show the snippet
+     and ask whether to add a `verify` job to it.
+   - Otherwise the git remote host → `github.com` = Actions, a GitLab host = GitLab CI,
+     `bitbucket.org` = Pipelines.
+   - No remote, or an unrecognized host → offer the **local git hook**, or nothing.
+2. **Confirm before writing.** State the provider, the exact file path, and that it will run
+   `./tests/verify.sh` on push. Ask once.
+3. **Copy the matching template verbatim** from `references/ci-templates.md`. Do not add check logic
+   to it — if a check needs to change it changes in `verify.sh`, and every provider inherits it.
+   Never invent a config for a provider the templates do not cover; say it is unsupported and give
+   the manual command instead.
+4. **Run `./tests/verify.sh`** and report the result. This is the same command CI will run, so a
+   green local run is real evidence the generated config will pass.
+
+If the user declines CI, say so plainly and tell them the manual command — do not skip silently and
+leave them assuming they are covered.
+
+### Step 6: Report and hand off
+
+State plainly:
+- Which of the seven sections are filled, and which the user deferred.
+- Which guidebook rules are now auditable that were not: §2.2, §5.3, §7.3, §11.2.
+- Which remain blocked, if any section was left empty.
+- The CI provider chosen, the file written, and the `./tests/verify.sh` result.
+
+Then offer once: run `/so-best-practice-audit` on the project to get a first conformance read
+against the newly configured standard.
+
+## Rules
+
+- **Never edit `shared/guidebook.md`.** It is the upgradable canonical standard. Everything
+  project-specific goes in `platform.md`. If the user wants to change a guidebook rule itself, that
+  is a `/so-skills` job, not this one.
+- **Never invent platform mechanics, and never invent a CI provider.** If you cannot determine the
+  event-trigger primitive or a deploy command, leave the section empty and say so. The build vendors
+  a NOT-CONFIGURED stub and the audit reports the gap — that failure mode is deliberate and honest.
+  Likewise, if the git host is not one the templates cover, say it is unsupported rather than
+  guessing at a config shape. A plausible-sounding fabricated command or config is a liability.
+- **Never overwrite an existing CI config.** Show the addition and ask.
+- **Detect before asking.** An interview that asks what `package.json` already answers wastes the
+  user's time and signals you didn't look.
+- **No machine-specific paths** in anything you write (`tests/guard_no_machine_paths.sh` enforces
+  it). Use `$HOME`, `~/`, or a `<placeholder>`.
+
+## Stopping Points
+
+- ✋ Step 0: if already initialized, confirm update vs CI-only vs re-run vs stop.
+- ✋ Step 3: after drafting, before writing `platform.md` or `AGENTS.md`.
+- ✋ Step 5: before writing a CI config, and always before touching an existing one.
+
+## Output
+
+`shared/platform.md` (seven sections, Guidebook §17 answered), a restricted-data block in
+`AGENTS.md` (§1.1), a CI config for the detected provider, regenerated vendored copies, and the
+`./tests/verify.sh` result — plus a statement of which guidebook rules became auditable and which
+remain blocked.
