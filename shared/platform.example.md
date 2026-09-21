@@ -75,15 +75,26 @@ The platform's concrete way to run work when data changes, instead of polling on
 
 *Referenced by Guidebook §2.6 (rollout inventory), §11.2 (deployment standards).*
 
-The real command per artifact type — and what each one does not cover.
+The real command per artifact type — **and what each one does not cover.**
+
+<!--
+  The "does NOT cover" column is the point of this table. Half-deployed changes hide in exactly
+  this gap: an app-deploy command that silently does not apply schema migrations, so the app
+  ships and the database does not. Write the gaps down and the rollout inventory (§2.6) becomes
+  mechanical instead of remembered.
+-->
 
 | Artifact | Command | Does NOT cover |
 |---|---|---|
-| <app / service> | | <e.g. schema migrations, secrets, grants> |
-| <schema / migrations> | | |
-| <config / secrets> | | |
+| <app / service> | <command> | <e.g. schema migrations, secrets, grants> |
+| <schema / migrations> | <command> | |
+| <scheduled jobs> | <command> | |
+| <config / secrets> | <command> | |
+| <infrastructure> | <command> | |
 
-Manual steps not covered by any command above:
+**Manual steps not covered by any command above:**
+
+<!-- list them, or "none" — an undocumented manual step is the operational risk §1.3 warns about -->
 
 ---
 
@@ -91,7 +102,24 @@ Manual steps not covered by any command above:
 
 *Referenced by Guidebook §1.1 (restricted data), §2.2 (corroboration).*
 
-The automated classification the platform offers, used read-only to corroborate a developer's self-attestation about restricted data.
+The automated classification the platform offers, used read-only to corroborate a developer's
+self-attestation about restricted data.
+
+<!--
+  The self-attestation in §2.2 is authoritative and always runs. This is the second signal that
+  can only STRENGTHEN the gate, never downgrade it.
+
+  Name the read API and the field that indicates sensitivity. Examples:
+    - BigQuery: policy tags / data catalog taxonomy on column metadata
+    - AWS: Macie findings, read via GetFindings
+    - Postgres: pgcrypto column comments or an in-house classification table
+    - None available: say so explicitly. Corroboration then degrades to attestation-only, which
+      is a documented state, not a gap to hide.
+
+  MUST be read-only. Do not trigger an on-demand classification scan from a review workflow.
+-->
+
+<!-- your answer, or "none available — attestation only" -->
 
 ---
 
@@ -101,6 +129,19 @@ The automated classification the platform offers, used read-only to corroborate 
 
 The canonical packages to use instead of hand-rolling platform access, auth, or UI.
 
+<!--
+  This turns "you reimplemented something we already have" from a style opinion into an auditable
+  finding. List package name -> what it owns. If the org has none yet, say "none" — that is a
+  real answer and stops the audit inventing one.
+
+  Example:
+    @acme/db-client   -> connection pooling, query tagging, retry
+    @acme/auth        -> session verification, role checks
+    @acme/ui          -> design tokens, components, env banner
+-->
+
+<!-- your answer, or "none" -->
+
 ---
 
 ## 6. Reference implementations
@@ -109,8 +150,21 @@ The canonical packages to use instead of hand-rolling platform access, auth, or 
 
 In-house examples worth copying, with links.
 
+<!--
+  Prefer-native (§1.2) only works if the agent can find the prior art. Point at the repo or path
+  that does each thing correctly, so the next implementation composes instead of reinventing.
+
+  Example:
+    Event-driven pipeline -> github.com/acme/order-events (the §7.3 reference)
+    Service scaffold      -> github.com/acme/service-template
+-->
+
+<!-- your answer -->
+
 ---
 
 ## 7. Project-specific additions
 
 Anything the guidebook does not cover that this stack requires. Optional.
+
+<!-- your answer, or delete this section -->
