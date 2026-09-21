@@ -9,13 +9,13 @@ shows file names only; the Markdown contains starter guidance to customize.
 | --- | --- |
 | `docs/adr/` | Architecture decision records |
 | `shared/` | Source files for common guidance and templates (`platform.md` is project-owned and gitignored) |
-| `so-best-practice-audit/` | Review a project against relevant practices |
-| `so-bug-review-interview/` | Clarify and investigate a reported bug |
-| `so-build-feature-interview/` | Turn a feature request into an implementation brief |
-| `so-changes/` | Summarize a set of code changes |
-| `so-codex-review/` | Review code for actionable defects |
-| `so-init/` | Establish project context and conventions |
-| `so-skills/` | Create or update skills in the collection |
+| `so-best-practice-audit` | Review a project against relevant practices |
+| `so-bug-review-interview` | Clarify and investigate a reported bug |
+| `so-build-feature-interview` | Turn a feature request into an implementation brief |
+| `so-changes` | Summarize a set of code changes |
+| `so-codex-review` | Review code for actionable defects |
+| `so-init` | Establish project context and conventions |
+| `so-skills` | Create or update skills in the collection |
 | `tests/` | Future behavioral checks and fixtures |
 
 Each skill has a `SKILL.md` with a name, description, and concise workflow.
