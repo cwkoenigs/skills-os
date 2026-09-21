@@ -1,11 +1,104 @@
-# Working in skills-os
+# AGENTS.md — skill-os
 
-This repository contains reusable skills. See [README.md](README.md) for the layout
-and build command, and [shared/guidebook.md](shared/guidebook.md) for the
-Software Project Best Practices Guidebook the cadence skills follow.
+## Project Overview
 
-- Keep each skill's name and description in its `SKILL.md` YAML frontmatter.
-- Keep workflow instructions focused on the skill's stated purpose.
-- Edit shared resources in `shared/`, then run `./build.sh` to refresh their copies.
-- Add supporting material to a skill's `references/` directory when needed and
-  link it from that skill's instructions.
+`skill-os` is a skill system skeleton: a canonical standard (`shared/guidebook.md`), a change cadence
+that executes it (`shared/cadence-core.md`), six skills, a vendoring generator (`build.sh`), and CI
+guards. See `README.md` for the architecture.
+
+## Architecture Boundaries
+
+Policy flows one direction: **guidebook → cadence-core → vendored copies → skill runtime.**
+
+- `shared/` holds the only editable sources of policy.
+- `so-*/cadence-core.md` and `so-best-practice-audit/references/guidebook.md` are **generated**.
+  Never edit them. Edit the `shared/` source and run `./build.sh`.
+- Skills are flat: `so-<name>/SKILL.md` plus optional `references/`. No cross-skill imports —
+  skills reference each other by invocation (`/so-codex-review`), not by file path.
+
+## Directory Map
+
+```
+shared/         canonical guidebook + cadence (the only editable policy sources)
+so-*/           one directory per skill; SKILL.md required
+tests/          shell guards, self-testing
+docs/adr/       architecture decision records
+build.sh        vendors shared/ sources into consumer skills
+install.sh      registers the remote; derives the skill list from the filesystem and
+                discovers the manifest path by shape-validated search
+```
+
+## Setup
+
+No dependencies beyond `bash`, `git`, and `python3`.
+
+## Required Checks
+
+```bash
+./tests/verify.sh
+```
+
+Six checks, one exit code: generated-copies, machine-paths, registry, readme-table, skill-size,
+platform-split. Run after changing anything in `shared/` or adding a skill.
+
+`verify.sh` is the single source of check logic. CI configs are **generated per-project** by
+`/so-init` and are thin wrappers that call it — never add check logic to a CI config, or each
+provider grows its own idea of "passing."
+
+## Coding Standards
+
+- `so-` prefix, kebab-case skill names.
+- `SKILL.md` under 500 lines; detail goes in `references/`.
+- Frontmatter descriptions are action-oriented and trigger-rich.
+- No machine-specific paths — use `$HOME`, `~/`, or a `<placeholder>`.
+- No auxiliary docs inside a skill folder (no README, CHANGELOG, or committed audit reports).
+
+## Testing Standards
+
+Guards must **self-test their own patterns** — assert that a known-bad input is caught and a
+known-good input is allowed, so a broken guard fails loudly rather than passing vacuously. Prove a
+new guard works by feeding it a violation.
+
+Guards assert runnable artifacts, not string presence (Guidebook §10.3).
+
+No allowlists in guards. If a match is legitimate, rewrite the content.
+
+## Security and Privacy Rules
+
+**Restricted-data categories for this project (Guidebook §1.1):**
+
+This repo contains policy documents, workflow definitions, and shell scripts. It holds **no**
+personal, regulated, or customer data. Restricted categories are therefore:
+
+| Category | Applies here |
+|---|---|
+| Personal data | No |
+| Regulated data | No |
+| Customer-confidential | No |
+| Company-confidential | **Yes** — credentials, tokens, internal URLs, unreleased plans |
+
+Consequence: the data gate normally resolves to `No`, so external review is permitted. It is still
+asked every time — the gate is cheap and the answer is recorded.
+
+Never commit credentials, tokens, or internal hostnames. Check what generator scripts bake into
+committed output, not just what is gitignored (Guidebook §9.2).
+
+## Data Rules
+
+None — this repo has no datasets.
+
+## Files Requiring Extra Care
+
+| File | Why |
+|---|---|
+| `shared/guidebook.md` | Canonical policy. Changing a section number breaks `Canonical: §X` citations in `cadence-core.md`. Renumber both together. |
+| `shared/cadence-core.md` | Executed at runtime by three skills. Verify its citations still resolve after any guidebook edit. |
+| `build.sh` | Its `synced -> ` output format is parsed by `tests/guard_generated_copies.sh`. |
+| `install.sh` | Writes to the user's agent manifest. Must stay idempotent, must never invent a manifest path, and must refuse to overwrite non-JSON. Discovery validates by parsing, not by filename — a name match can write a file the runtime never reads. |
+
+## PR Response Format
+
+- Summary
+- Tests run (name the guards and their exit status)
+- Risks/limitations
+- Files changed
