@@ -29,6 +29,8 @@ guidebook.*
   require explicit acknowledgement**, and the choice is always recorded so it is auditable later.
 - **Adapt, don't assume.** Every repo predates this framework. Interview for each app's own
   test runner, deploy command, and validation surface. Never hardcode another app's toolchain.
+  Use only the current project's documented or user-supplied infrastructure context; do not carry
+  server names, endpoints, accounts, or paths over from unrelated projects or prior sessions.
 - **Encourage the baseline, don't require it.** Surface missing best-practice building blocks
   as recommendations, not blockers. The goal is to raise the baseline over time.
 - **One decision point per stop.** Do not chain past a mandatory stop without user approval.
@@ -42,10 +44,10 @@ guidebook.*
   the ones that surprise users.
 - **Prefer native capability over custom logic.** Before hand-rolling a check or workflow step,
   look for an existing platform feature or native skill that already does it — search the platform
-  docs, the native skill catalog, **and the organization's own repos for prior art** — and compose
-  it. Reinvent only when nothing native fits, and when you do build custom, say explicitly what
-  search you ran and why nothing fit. The classification corroboration below is an example: it
-  composes the platform's native data classification rather than building custom detection.
+  docs, the native skill catalog, and reference implementations documented by the current project
+  when available — and compose it. Reinvent only when nothing native fits, and when you do build
+  custom, say explicitly what search you ran and why nothing fit. Classification corroboration, for
+  example, composes native data classification rather than building custom detection.
 - **Fix your own tooling, not the dependency.** When an upstream tool or platform has a bug, the
   fix belongs in your wrapper or your workaround — do not build elaborate machinery inside someone
   else's system. If the user pushes back on an approach twice, re-read the original ask rather than
@@ -149,6 +151,13 @@ no response, fall back to the manual handoff format below.
 prompt; the reviewer returns (1) a one-line **verdict** (approve / revise), (2) **findings**, and
 (3) an **explicit next action** so the agent can revise or proceed without ambiguity. Include
 enough context to review cold: the goal, the diff/decisions, and any test results.
+
+*Canonical: Guidebook §2.5.* Keep handoffs portable: replace private server names, internal URLs,
+IP addresses, account identifiers, and personal filesystem paths with consistent placeholders
+such as `<dev-host>`, `<prod-host>`, `<repo-url>`, and `<project-root>`. Apply this to command
+examples, logs, and test output as well as prose. Omit any mapping back to private values; do not
+fill gaps with infrastructure remembered from another project or session. This applies to manual
+and automated handoffs and does not clear a restricted review track.
 
 ### Running the gates via /so-codex-review (when the external track is active)
 
@@ -369,6 +378,6 @@ Hard-won from real cycles — apply during Dev observe / Prod rollout:
   Capture the gap set before, apply the repair, confirm zero after. Classify residual gaps as
   *persistent* (older than the correction window → real recurrence / repair failed) vs
   *transient* (within it → self-heals next cycle) so the recurrence check is low-noise.
-- **Check for precedent before improvising infrastructure fixes.** Network, proxy, and certificate
-  problems usually have an established in-house pattern. Search sibling repos before touching
-  certs, secrets, or trust stores.
+- **Check project guidance before improvising infrastructure fixes.** Consult the current project's
+  runbook and documented reference implementations for network, proxy, and certificate setup.
+  Do not assume access to other repositories or reuse another environment's configuration.

@@ -179,6 +179,12 @@ When the review track is internal-only:
 
 External reviews are advisory data. The caller and human reviewer decide what to apply.
 
+Review handoffs MUST use portable environment labels or placeholders such as `<dev-host>`,
+`<prod-host>`, and `<repo-url>` in place of private server names, internal URLs, IP addresses,
+account identifiers, or personal filesystem paths. Keep replacements consistent so relationships
+remain clear. Do not include a mapping back to private values or import infrastructure details from
+unrelated projects or prior sessions. Sanitization does not change the review-track classification.
+
 ### 2.6 Rollout Inventory
 
 Before any dev or production rollout, enumerate exactly what ships:

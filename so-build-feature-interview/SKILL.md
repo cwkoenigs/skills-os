@@ -110,6 +110,9 @@ Then **write the decision log** using the template in `cadence-core.md` (Feature
 
 ### Step 5: Handoff
 
+Use the **Standard handoff format** in `cadence-core.md`, including its placeholders for private
+infrastructure and personal paths in the plan and supporting evidence.
+
 - If the review track includes external review: ask the developer to confirm, then run gate G1 via
   `/so-codex-review` (mode `plan`), passing `restricted`, `review_track`, and `risk`. On no, hand the
   plan over for manual review.

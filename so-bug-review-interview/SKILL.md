@@ -137,6 +137,9 @@ and the extra fields: `Symptom`, `Root cause`, `Regression window`, `Sibling occ
 
 ### Step 6: Handoff
 
+Use the **Standard handoff format** in `cadence-core.md`, including its placeholders for private
+infrastructure and personal paths in the plan and reproduction evidence.
+
 - If the review track includes external review: ask the developer to confirm, then run gate G1 via
   `/so-codex-review` (mode `plan`), passing `restricted`, `review_track`, and `risk`. On no, hand the
   plan over for manual review.
