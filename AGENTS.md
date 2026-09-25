@@ -65,22 +65,10 @@ No allowlists in guards. If a match is legitimate, rewrite the content.
 
 ## Security and Privacy Rules
 
-**Restricted-data categories for this project (Guidebook §1.1):**
+This repo contains policy documents, workflow definitions, and shell scripts. External review is
+always available; there is no data-classification question.
 
-This repo contains policy documents, workflow definitions, and shell scripts. It holds **no**
-personal, regulated, or customer data. Restricted categories are therefore:
-
-| Category | Applies here |
-|---|---|
-| Personal data | No |
-| Regulated data | No |
-| Customer-confidential | No |
-| Company-confidential | **Yes** — credentials, tokens, internal URLs, unreleased plans |
-
-Consequence: the data gate normally resolves to `No`, so external review is permitted. It is still
-asked every time — the gate is cheap and the answer is recorded.
-
-Never commit credentials, tokens, or internal hostnames. Check what generator scripts bake into
+Never commit credentials, tokens, or private keys. Check what generator scripts bake into
 committed output, not just what is gitignored (Guidebook §9.2).
 
 ## Data Rules

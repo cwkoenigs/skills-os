@@ -1,23 +1,22 @@
 ---
 name: so-init
-description: "Adopt skill-os into a project — detects the stack and git host, interviews for the platform standards (Guidebook §17) and restricted-data categories (§1.1), then writes shared/platform.md, AGENTS.md, and a CI config for the detected provider. Run once per project. Triggers: so-init, init skill-os, adopt skill-os, set up skill-os, configure platform standards, fill in section 17, platform.md, restricted data categories, onboard this repo, bootstrap the guidebook, generate CI, set up CI, add a CI config."
+description: "Adopt skill-os into a project — detects the stack and git host, interviews for the platform standards (Guidebook §17), then writes shared/platform.md and a CI config for the detected provider. Run once per project. Triggers: so-init, init skill-os, adopt skill-os, set up skill-os, configure platform standards, fill in section 17, platform.md, onboard this repo, bootstrap the guidebook, generate CI, set up CI, add a CI config."
 user-invocable: true
 ---
 
 # so-init (adopt skill-os into a project)
 
 Turn a generic skill-os checkout into one configured for **this** project. The guidebook is
-stack-agnostic and never edited; this skill produces the three project-owned artifacts it
+stack-agnostic and never edited; this skill produces the two project-owned artifacts it
 depends on:
 
 | Artifact | Answers | Source |
 |---|---|---|
-| `shared/platform.md` | seven platform sections | Guidebook §17 |
-| `AGENTS.md` restricted-data categories | what counts as restricted here | Guidebook §1.1, §9.1 |
+| `shared/platform.md` | six platform sections | Guidebook §17 |
 | CI config for the detected provider | how the checks run unattended | `references/ci-templates.md` |
 
-Run once per project, then re-run any time the stack changes. It writes at most three files (plus
-regenerating vendored copies) — it does not touch skills or the guidebook.
+Run once per project, then re-run any time the stack changes. It writes at most two files (plus
+regenerating vendored copies) — it does not touch skills, `AGENTS.md`, or the guidebook.
 
 **Nothing here is shipped pre-decided.** A hardcoded `.gitlab-ci.yml` would be one org's assumption
 imposed on every adopter; a hardcoded platform appendix would be one stack's. Both are detected and
@@ -34,12 +33,10 @@ generated instead.
 
 ### Step 0: Check what already exists
 
-1. If `shared/platform.md` exists, this project is already initialized. Show which of the seven
+1. If `shared/platform.md` exists, this project is already initialized. Show which of the six
    sections are filled vs empty, and whether a CI config exists, then offer: **update a section**,
    **generate CI only**, **re-run fully**, or **stop**. Do not silently overwrite existing answers.
-2. If `AGENTS.md` exists, read it. Preserve everything in it; you are adding or replacing only the
-   restricted-data block.
-3. Read the vendored `platform.example.md` to get the current section list and the guidance comments
+2. Read the vendored `platform.example.md` to get the current section list and the guidance comments
    for each. That file is the contract.
 
 ### Step 1: Detect the stack (read-only, before asking anything)
@@ -74,7 +71,7 @@ could not determine. Present inferences as inferences.
 Use the question tool. Ask about what detection could not settle; confirm inferences in bulk rather
 than one at a time. Order matters — start with what you know least.
 
-Cover the seven `platform.md` sections. Two deserve extra care:
+Cover the six `platform.md` sections. Two deserve extra care:
 
 - **Deploy commands (§3)** — the *"does NOT cover"* column is the point of the table, and nobody
   volunteers it. Ask directly: *"When you run `<detected deploy command>`, what does it NOT apply?
@@ -85,33 +82,15 @@ Cover the seven `platform.md` sections. Two deserve extra care:
   scheduled on a calendar. If the honest answer is "we poll today," record that as the current state
   plus the intended target; do not write an aspiration as if it were the standard.
 
-**"None" and "not available" are valid answers** for shared packages, classification tooling, and
-reference implementations. Record them explicitly. An honest "none" stops the audit from inventing
+**"None" and "not available" are valid answers** for shared packages and reference
+implementations. Record them explicitly. An honest "none" stops the audit from inventing
 one; a vague placeholder is worse than an empty section because it looks configured.
 
-### Step 3: Interview the restricted-data categories
+**⚠️ STOP:** Present the drafted `platform.md` for review before writing. It becomes the standard
+the audit skill enforces; a wrong answer here is worse than an empty one, because it will be cited
+as settled.
 
-Guidebook §1.1 is unenforceable until this is answered, and it decides whether external review is
-ever permitted (`so-codex-review` refuses on anything but a clear).
-
-Ask which categories apply, and for each one that does, what it concretely means here:
-
-| Category | Examples |
-|---|---|
-| Personal data | names, addresses, emails, phone, national identifiers, dates of birth |
-| Regulated data | health records, payment-card data, financial account data |
-| Customer-confidential | customer-owned data held under contract |
-| Company-confidential | credentials, tokens, internal hostnames, unreleased plans, security findings |
-
-A project with **no** restricted exposure records that explicitly — it does not skip the gate. Note
-the practical consequence in the file: if nothing is restricted, the gate normally clears and
-external review is available; if something is, say which workflows it blocks.
-
-**⚠️ STOP:** Present the drafted `platform.md` and the restricted-data block for review before
-writing. These become the standard the audit skill enforces; a wrong answer here is worse than an
-empty one, because it will be cited as settled.
-
-### Step 4: Write the platform + agent files
+### Step 3: Write the platform file
 
 On approval:
 
@@ -120,13 +99,10 @@ On approval:
    line so the traceability survives. Strip the template's instructional `<!-- -->` guidance
    comments; keep your answers as prose and tables. Delete a section only if the user said it does
    not apply, and say why inline.
-2. **`AGENTS.md`** — insert or replace a `## Security and Privacy Rules` subsection containing the
-   restricted-data table and its consequence. **Preserve every other section.** If `AGENTS.md` does
-   not exist, create it using the Guidebook §8.6 template.
-3. Run `./build.sh` so `platform.md` is vendored into `so-best-practice-audit/references/` (this
+2. Run `./build.sh` so `platform.md` is vendored into `so-best-practice-audit/references/` (this
    replaces the NOT-CONFIGURED stub).
 
-### Step 5: Generate the CI config for the detected provider
+### Step 4: Generate the CI config for the detected provider
 
 The checks themselves live in `tests/verify.sh` — one runner, provider-agnostic. A CI config is a
 thin wrapper around it, so it is generated per-environment rather than shipped.
@@ -152,8 +128,8 @@ leave them assuming they are covered.
 ### Step 6: Report and hand off
 
 State plainly:
-- Which of the seven sections are filled, and which the user deferred.
-- Which guidebook rules are now auditable that were not: §2.2, §5.3, §7.3, §11.2.
+- Which of the six sections are filled, and which the user deferred.
+- Which guidebook rules are now auditable that were not: §5.3, §7.3, §11.2.
 - Which remain blocked, if any section was left empty.
 - The CI provider chosen, the file written, and the `./tests/verify.sh` result.
 
@@ -180,11 +156,11 @@ against the newly configured standard.
 
 - ✋ Step 0: if already initialized, confirm update vs CI-only vs re-run vs stop.
 - ✋ Step 3: after drafting, before writing `platform.md` or `AGENTS.md`.
-- ✋ Step 5: before writing a CI config, and always before touching an existing one.
+- ✋ Step 4: before writing a CI config, and always before touching an existing one.
 
 ## Output
 
-`shared/platform.md` (seven sections, Guidebook §17 answered), a restricted-data block in
-`AGENTS.md` (§1.1), a CI config for the detected provider, regenerated vendored copies, and the
+`shared/platform.md` (six sections, Guidebook §17 answered), a CI config for the detected
+provider, regenerated vendored copies, and the
 `./tests/verify.sh` result — plus a statement of which guidebook rules became auditable and which
 remain blocked.

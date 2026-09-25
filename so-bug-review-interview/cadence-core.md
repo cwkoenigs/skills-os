@@ -4,11 +4,10 @@
 
 Shared **operational profile** of the Software Project Best Practices Guidebook, for
 interview-driven change workflows (features **and** bug fixes). The **guidebook
-(`shared/guidebook.md`) is the canonical source** for the underlying policy (restricted-data gate,
-review track, decision-log template, phase format, rollout safety); this file cites it inline as
-`Canonical: Guidebook §X` and carries only what the cadence skills execute at runtime **plus** the
-operational mechanics the guidebook does not cover (external-review gate delegation, classification
-corroboration, field-tested learnings). **When shared policy changes, edit the guidebook first, then
+(`shared/guidebook.md`) is the canonical source** for the underlying policy (decision-log
+template, phase format, rollout safety); this file cites it inline as `Canonical: Guidebook §X` and
+carries only what the cadence skills execute at runtime **plus** the operational mechanics the
+guidebook does not cover (external-review gate delegation, field-tested learnings). **When shared policy changes, edit the guidebook first, then
 reconcile the operational restatement here.**
 
 Each skill supplies its own **interview** and **phased plan**; everything below is common.
@@ -21,12 +20,9 @@ Each skill supplies its own **interview** and **phased plan**; everything below 
 ## Core Principles
 
 *Canonical: Guidebook §1 (Operating Principles). The below is the operational restatement the
-cadence runs from; the data-gate and prefer-native bullets add cadence-specific mechanics not in the
+cadence runs from; the prefer-native bullet adds a cadence-specific mechanic not in the
 guidebook.*
 
-- **Restricted data gates the whole plan.** If restricted data is involved (as defined for this
-  project — Guidebook §1.1), external-model review is not appropriate. Current policy is **warn +
-  require explicit acknowledgement**, and the choice is always recorded so it is auditable later.
 - **Adapt, don't assume.** Every repo predates this framework. Interview for each app's own
   test runner, deploy command, and validation surface. Never hardcode another app's toolchain.
   Use only the current project's documented or user-supplied infrastructure context; do not carry
@@ -46,8 +42,7 @@ guidebook.*
   look for an existing platform feature or native skill that already does it — search the platform
   docs, the native skill catalog, and reference implementations documented by the current project
   when available — and compose it. Reinvent only when nothing native fits, and when you do build
-  custom, say explicitly what search you ran and why nothing fit. Classification corroboration, for
-  example, composes native data classification rather than building custom detection.
+  custom, say explicitly what search you ran and why nothing fit.
 - **Fix your own tooling, not the dependency.** When an upstream tool or platform has a bug, the
   fix belongs in your wrapper or your workaround — do not build elaborate machinery inside someone
   else's system. If the user pushes back on an approach twice, re-read the original ask rather than
@@ -59,58 +54,13 @@ guidebook.*
   no per-entity alert sprawl); consume telemetry through **stable curated views**, not raw internal
   tables (*Canonical: Guidebook §5.4*). The platform's concrete event-trigger mechanism lives in the
   guidebook's §17 appendix. This is a discovery **nudge** — flag any polling / raw-table design as a
-  gap; it does not override the interview or the data gate.
-
-## Review-Track Classification (mandatory, before any planning)
-
-*Canonical: Guidebook §1.1 & §2.2. The operational wording below is what the cadence skills ask
-verbatim — keep it aligned with the guidebook.*
-
-Ask the restricted-data question explicitly: *"Does this work read, write, derive from, or display
-restricted data, as defined for this project?"* — offer Yes / No / Unsure, and state the project's
-categories from `AGENTS.md` (Guidebook §1.1) so the user can answer concretely. **Treat Unsure as
-Yes** for safety.
-
-- **If restricted = No:** review track is **Internal + external** (plan and diffs get external
-  review).
-- **If restricted = Yes/Unsure:** WARN clearly that this restricts review to **internal-only** (no
-  external-model review), then **require explicit acknowledgement** to proceed. Record the
-  exact wording of the acknowledgement.
-
-**⚠️ MANDATORY STOP:** Do not proceed until the user acknowledges the review track.
-
-### Optional corroboration (native classification)
-
-*Extends Guidebook §2.2 (classification corroboration) with the concrete operational procedure —
-cadence-specific, not in the guidebook.*
-
-The self-attestation above is authoritative and always runs. When the change touches **named
-datasets**, corroborate that answer against the platform's native data classification —
-**read-only**, run during discovery once the touched objects are known. This composes a native
-governance capability; it does not reimplement detection. The platform's specific classification
-tooling is recorded in the guidebook's §17 appendix.
-
-1. **Read existing results** for each touched dataset using the platform's classification read API.
-   Read-only; never trigger an on-demand classification scan from this workflow.
-2. **Flag restricted** — any field whose classification maps to one of the project's restricted
-   categories (Guidebook §1.1), or that the platform marks as an identifier / quasi-identifier.
-3. **If restricted data is found and the user answered No/Unsure:** treat as **Yes**, warn, and
-   **re-raise the review-track MANDATORY STOP** (a new decision point) before any planning.
-   Corroboration can only strengthen the gate — it never downgrades a "Yes."
-4. **If no classification data exists / the feature is unavailable / no read access:** note it,
-   proceed on the self-attestation alone, and surface a **one-time recommendation** to enable
-   automated classification.
-
-**When classification is enabled later:** this check is built to degrade gracefully, so it needs
-**no skill change** to activate — the day the platform turns on classification, corroboration
-begins returning results automatically. Record the outcome in the decision log (corroboration
-fields).
+  gap; it does not override the interview.
 
 ## Deploy-Target Scoping (early, before planning)
 
 *Canonical: Guidebook §4.1 (Definition of Ready — deploy target/environments) & §2.6 (rollout
-inventory). An explicit scoping decision that right-sizes the plan; ask it alongside the
-review-track question, before generating the phased plan.*
+inventory). An explicit scoping decision that right-sizes the plan; ask it before generating the
+phased plan.*
 
 Ask explicitly: *"Is this change targeting a **PROD rollout** (a shared/live environment other
 people use), or staying **LOCAL/DEV-only** (run locally or on a dev deploy, not promoted to
@@ -129,9 +79,9 @@ users)?"* — offer **PROD** / **LOCAL/DEV**.
   ceremony + G3 back before promoting.
 
 Record the resolved target in the decision log (Deploy target field). This is a scoping decision
-only — it never relaxes the restricted-data / review-track gate.
+only.
 
-## The Three External Review Gates (when the external track is active)
+## The Three External Review Gates
 
 Review at: (1) **plan** — before implementation; (2) **interim** — after implementation with
 tests passing, before QA/docs/rollout; and (3) **pre-closeout** — after docs cleanup, before
@@ -141,8 +91,7 @@ still run. The agent always GENERATES the review prompt (see Handoff format). **
 proceed:** applying the reviewer's own prescribed revisions does NOT require another gate — apply
 and proceed. Route a fresh review only when a revision introduces new scope/behavior, or the work
 surfaces a new edge the reviewer hasn't seen. This avoids round-trip churn while still catching
-genuinely new risk. If external review is not active (restricted track), note it and proceed
-internal-only. When the external track is active, ask the developer to confirm before invoking
+genuinely new risk. Ask the developer to confirm before invoking
 `/so-codex-review` at each gate — do not invoke automatically. On explicit yes, run the gate via the
 `/so-codex-review` skill (see **Running the gates** below) rather than manual copy/paste. On no or
 no response, fall back to the manual handoff format below.
@@ -152,32 +101,22 @@ prompt; the reviewer returns (1) a one-line **verdict** (approve / revise), (2) 
 (3) an **explicit next action** so the agent can revise or proceed without ambiguity. Include
 enough context to review cold: the goal, the diff/decisions, and any test results.
 
-*Canonical: Guidebook §2.5.* Keep handoffs portable: replace private server names, internal URLs,
-IP addresses, account identifiers, and personal filesystem paths with consistent placeholders
-such as `<dev-host>`, `<prod-host>`, `<repo-url>`, and `<project-root>`. Apply this to command
-examples, logs, and test output as well as prose. Omit any mapping back to private values; do not
-fill gaps with infrastructure remembered from another project or session. This applies to manual
-and automated handoffs and does not clear a restricted review track.
+### Running the gates via /so-codex-review
 
-### Running the gates via /so-codex-review (when the external track is active)
-
-When the review track is **Internal + external**, ask the developer to confirm before invoking
-`/so-codex-review` at each gate — never invoke it automatically. Once confirmed, run each gate by
-invoking the **`/so-codex-review`** skill instead of a manual copy/paste handoff. Pass it the
-resolved assertion (`restricted` and `review_track`), the artifact for the gate, and the change's
-**`risk`** (`Standard` | `High` — from the Phase 2 risk assessment; `High` for security, auth,
-migrations, concurrency, data-loss / restricted-adjacent, or destructive changes):
+Ask the developer to confirm before invoking `/so-codex-review` at each gate — never invoke it
+automatically. Once confirmed, run each gate by invoking the **`/so-codex-review`** skill instead
+of a manual copy/paste handoff. Pass it the artifact for the gate and the change's **`risk`**
+(`Standard` | `High` — from the Phase 2 risk assessment; `High` for security, auth, migrations,
+concurrency, data-loss, or destructive changes):
 
 - **G1 (plan)** → mode `plan` (pipe the plan text)
 - **G2 (interim)** → mode `diff` (reviews the uncommitted working tree)
 - **G3 (pre-closeout)** → mode `delta` (reviews the full branch delta vs the base)
 
-`/so-codex-review` owns the mechanics **and** the boundary: it enforces the data gate
-**fail-closed** (restricted = Yes/Unsure, or a missing/ambiguous assertion → refusal, sending
-nothing externally — this is a refusal, **not** a manual handoff), detects the CLI, selects the
-review model and reasoning effort, **degrades without blocking** if the CLI predates the configured
-model, and falls back to the manual handoff ONLY when the track is already cleared but the CLI is
-absent. It returns the standard verdict / findings / next-action **plus the model/reasoning it ran
+`/so-codex-review` owns the mechanics: it refuses only when an actual credential is in the
+payload, detects the CLI, selects the review model and reasoning effort, **degrades without
+blocking** if the CLI predates the configured model, and falls back to the manual handoff ONLY when
+the CLI is absent. It returns the standard verdict / findings / next-action **plus the model/reasoning it ran
 on**, which you capture into the matching G1/G2/G3 tracker row and decision log. If
 `/so-codex-review` is not installed, use the manual handoff described above.
 
@@ -186,8 +125,8 @@ on**, which you capture into the matching G1/G2/G3 tracker row and decision log.
 *Canonical template: Guidebook §3.1. The template below is the cadence's working copy (skills fill
 it in); keep its field names aligned with §3.1.*
 
-**Purpose:** durable, auditable "why" behind each change — interview answers, data classification,
-review track, baseline gaps, and (for bugs) root cause and recurrence guard.
+**Purpose:** durable, auditable "why" behind each change — interview answers, baseline gaps, and
+(for bugs) root cause and recurrence guard.
 
 **v1 (now):** markdown directory in the project repo, one file per change:
 `docs/decisions/<YYYY-MM-DD>-<app-slug>-<slug>.md`
@@ -203,12 +142,7 @@ practice.
 ```markdown
 # <Feature | Bug>: <summary>
 - Date: <YYYY-MM-DD>   App/repo: <app>   Author: <user>
-- Restricted data: <No | Yes | Unsure→treated as Yes>
-- Review track: <Internal + external | Internal-only (restricted)>
 - Deploy target: <PROD | LOCAL/DEV — LOCAL/DEV omits Prod rollout + G3 (Cleanup still runs)>
-- Acknowledgement: <verbatim acknowledgement, or N/A>
-- Corroboration: <checked N datasets | not applicable (no named datasets) | unavailable (classification not enabled)>
-- Corroboration result: <no restricted categories found | restricted data found in <dataset.field> → gate re-raised>
 
 ## Phase & Gate Tracker
 Legend: [x] done · [~] in progress · [ ] pending · [OP] operator-run. External gates prefixed G.
@@ -225,7 +159,7 @@ gate.
 | # | Phase / Gate | State | Evidence / outcome |
 |---|--------------|-------|--------------------|
 | 1 | Reproduce / discovery (read-only) | [ ] | |
-| 2 | Risk + data classification / review-track | [ ] | |
+| 2 | Risk assessment | [ ] | |
 | G1 | Plan review | [ ] | |
 | 3 | Failing tests first (bug) / tests-first (feature) | [ ] | |
 | 4 | Implement | [ ] | |

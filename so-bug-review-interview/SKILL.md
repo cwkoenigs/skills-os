@@ -15,7 +15,7 @@ review-ready plan and hands off.
 ## Setup
 
 **Load `cadence-core.md`** (same folder) first. It defines the shared cadence used here: Core
-Principles, the restricted-data gate + review-track classification, the three external review gates,
+Principles, the three external review gates,
 the handoff format, the decision-log artifact + template, and the field-tested learnings — it is the
 **operational profile** of the guidebook (`shared/guidebook.md` is the canonical standard; run
 `/so-best-practice-audit` to audit work against it). This SKILL.md only adds the **bug-specific**
@@ -44,16 +44,13 @@ Ask the user (use the question tool, group sensibly):
 6. **Deploy target** — ask as specified in `cadence-core.md` (**Deploy-Target Scoping**): is the
    fix headed for a **PROD rollout** or **LOCAL/DEV-only**? This right-sizes the plan (LOCAL/DEV
    omits the Prod rollout stage + the G3 gate).
-7. **Restricted-data screen** — ask exactly as specified in `cadence-core.md` (Review-Track
-   Classification), stating the project's categories from its `AGENTS.md`.
 
 **Output:** A filled bug interview record (kept in context for Step 5).
 
-### Step 2: Risk & Data Classification
+### Step 2: Risk
 
-Apply the **Review-Track Classification** from `cadence-core.md` and honor its MANDATORY STOP
-before any fix planning. Also set the change's **risk** (`Standard` | `High`) here — it feeds the
-external gates' reasoning effort. Data-loss and security bugs are `High`.
+Set the change's **risk** (`Standard` | `High`) here — it feeds the external gates' reasoning
+effort. Data-loss and security bugs are `High`.
 
 ### Step 3: Reproduce First (read-only)
 
@@ -82,9 +79,7 @@ explicitly accepts proceeding on an unreproduced bug with the recorded rationale
    stage, not an afterthought).
 4. **Native-capability reconnaissance** — before proposing custom logic, check the platform docs and
    the native skill catalog for existing features/skills that already cover part of the fix, and
-   prefer composing them (per the "Prefer native capability" principle in `cadence-core.md`). The
-   touched datasets/queries are known by now, so run the **Optional corroboration** from
-   `cadence-core.md` and re-raise the data gate if it contradicts the self-attestation.
+   prefer composing them (per the "Prefer native capability" principle in `cadence-core.md`).
 5. **Upstream vs ours** — if the root cause is in a dependency or platform, the fix belongs in *our*
    wrapper or workaround, not in elaborate machinery inside the dependency. Say which you chose and
    why.
@@ -137,13 +132,11 @@ and the extra fields: `Symptom`, `Root cause`, `Regression window`, `Sibling occ
 
 ### Step 6: Handoff
 
-Use the **Standard handoff format** in `cadence-core.md`, including its placeholders for private
-infrastructure and personal paths in the plan and reproduction evidence.
+Use the **Standard handoff format** in `cadence-core.md`.
 
-- If the review track includes external review: ask the developer to confirm, then run gate G1 via
-  `/so-codex-review` (mode `plan`), passing `restricted`, `review_track`, and `risk`. On no, hand the
-  plan over for manual review.
-- If internal-only: proceed to execution within the agent per the approved plan.
+- Ask the developer to confirm, then run gate G1 via `/so-codex-review` (mode `plan`), passing
+  `risk`. On no, hand the plan over for manual review and proceed within the agent per the approved
+  plan.
 
 This skill ends at handoff — the fix is applied by the normal agent flow, not here.
 
@@ -167,7 +160,7 @@ Hard-won from real bug cycles (in addition to the shared learnings in `cadence-c
 
 ## Stopping Points
 
-- ✋ Step 2: after data classification / review-track acknowledgement
+- ✋ Step 2: after the risk level is set
 - ✋ Step 3: after reproduction (or accepted rationale for an unreproduced bug)
 - ✋ Step 5: after fix plan + decision log presented, before handoff
 

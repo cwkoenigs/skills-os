@@ -2,8 +2,8 @@
 
 # Software Project Best Practices Guidebook
 
-**Version:** 1.0
-**Date:** 2026-09-14
+**Version:** 1.1
+**Date:** 2026-09-25
 **Audience:** engineers, data scientists, QA, operations, product partners, and workflow/skill maintainers
 **Purpose:** define the default operating standard for building resilient, auditable, secure, testable, low-maintenance software and data systems.
 
@@ -12,10 +12,9 @@ production-facing work while leaving room for exploratory analysis, prototypes, 
 investigation. When a project has a stronger local standard, follow the stronger standard and
 document the difference.
 
-> **Project setup:** two things are deliberately not in this file and MUST be defined per project
-> before the standard is fully enforceable — the **restricted-data categories** in §1.1/§9.1 (record
-> them in `AGENTS.md`) and the **platform standards** in `shared/platform.md` (§17). Run `/so-init`
-> to be interviewed for both. Everything else applies as written, unedited.
+> **Project setup:** one thing is deliberately not in this file and MUST be defined per project
+> before the standard is fully enforceable — the **platform standards** in `shared/platform.md`
+> (§17). Run `/so-init` to be interviewed for it. Everything else applies as written, unedited.
 
 ---
 
@@ -36,27 +35,13 @@ Every production repository SHOULD link this guide, or a project-specific deriva
 
 ## 1. Operating Principles
 
-### 1.1 Restricted Data Gates the Plan
+### 1.1 Retired: Restricted-Data Gate
 
-- Any work that reads, writes, derives from, or displays **restricted data** MUST be classified
-  before planning or external review.
-- If the answer is **Yes** or **Unsure**, treat it as restricted. Review stays internal and content
-  MUST NOT be sent to an external model-review service.
-- If the answer is **No**, the standard review track is internal plus external review, subject to
-  sanitization and local policy.
-- The review-track decision MUST be recorded in the decision log.
-
-**Define "restricted" per project.** This gate is only meaningful once the project names its
-categories. Record them in `AGENTS.md` or a project derivative of this guide. Common categories:
-
-| Category | Examples |
-|---|---|
-| Personal data | names, addresses, emails, phone numbers, national identifiers, dates of birth |
-| Regulated data | health records, payment-card data, financial account data |
-| Customer-confidential | customer-owned data held under contract |
-| Company-confidential | unreleased plans, security findings, credentials, trade secrets |
-
-A project with no restricted-data exposure records that explicitly. It does not skip the gate.
+Removed in v1.1 (2026-09-25). The per-change data-classification question and the internal-only
+review track were a carry-over from a project that handled regulated data; no current project
+does. External review is always available. The only content rule that remains is in §9.2: secrets
+never enter a diff, a log, or a review handoff, and `so-codex-review` refuses to transmit one it
+finds. The section number is kept so older references resolve.
 
 ### 1.2 Correctness Before Cleverness
 
@@ -68,8 +53,8 @@ A project with no restricted-data exposure records that explicitly. It does not 
 
 ### 1.3 Make Work Visible and Auditable
 
-- Material changes SHOULD create a decision log capturing the problem, data classification, review
-  track, assumptions, baseline gaps, plan, gates, and rollout evidence.
+- Material changes SHOULD create a decision log capturing the problem, assumptions, baseline
+  gaps, plan, gates, and rollout evidence.
 - Every production workflow SHOULD expose status, owner, inputs, outputs, failures, retry behavior,
   version, and where to look during an incident.
 - Hidden manual steps are operational risk. Eliminate them, automate them, or document them in the
@@ -95,7 +80,7 @@ A project with no restricted-data exposure records that explicitly. It does not 
 
 Use this cadence for material feature work, bug fixes, deployments, schema changes, production data
 workflows, and agent-assisted work. Small documentation or exploratory changes may use a lighter
-version, but the restricted-data gate still applies.
+version.
 
 ### 2.1 Intake
 
@@ -107,24 +92,12 @@ Capture:
 - Data sources, downstream consumers, and named datasets if known.
 - Environments: local, dev, QA/stage, production.
 - Test runner, deploy command, validation surface, and owner.
-- Restricted-data classification: No, Yes, or Unsure.
 - Acceptance criteria and definition of done.
 
-### 2.2 Review-Track Classification
+### 2.2 Retired: Review-Track Classification
 
-Ask explicitly:
-
-> Does this work read, write, derive from, or display restricted data, as defined for this project
-> (§1.1)?
-
-Rules:
-
-- **No:** review track is internal plus external review.
-- **Yes or Unsure:** review track is internal-only. Require explicit acknowledgement before
-  proceeding.
-- If named datasets are touched, corroborate the answer where the platform offers automated data
-  classification.
-- Corroboration can only strengthen the gate. It never downgrades a restricted answer.
+Removed in v1.1 with §1.1. There is one review track: internal review plus external review at the
+§2.5 gates, with the developer confirming before each external call.
 
 ### 2.3 Discovery and Baseline Scan
 
@@ -165,25 +138,13 @@ Planning rules:
 
 ### 2.5 Review Gates
 
-When the review track includes external review:
-
 - **G1 plan review:** review the plan before implementation.
 - **G2 interim review:** review the implemented diff after tests pass and before QA/rollout cleanup.
 - **G3 pre-closeout review:** review the full branch delta before production rollout.
 
-When the review track is internal-only:
-
-- Keep the same review discipline internally.
-- Do not send restricted content to external review.
-- Record that external review was skipped because of the data boundary.
-
-External reviews are advisory data. The caller and human reviewer decide what to apply.
-
-Review handoffs MUST use portable environment labels or placeholders such as `<dev-host>`,
-`<prod-host>`, and `<repo-url>` in place of private server names, internal URLs, IP addresses,
-account identifiers, or personal filesystem paths. Keep replacements consistent so relationships
-remain clear. Do not include a mapping back to private values or import infrastructure details from
-unrelated projects or prior sessions. Sanitization does not change the review-track classification.
+External reviews are advisory data. The caller and human reviewer decide what to apply. Ask the
+developer before each external call; if they decline, keep the same review discipline internally
+and record that the gate was reviewed internally.
 
 ### 2.6 Rollout Inventory
 
@@ -219,10 +180,6 @@ docs/decisions/<YYYY-MM-DD>-<app-slug>-bug-<slug>.md
 - App/repo:
 - Author:
 - Owner:
-- Restricted data: <No | Yes | Unsure treated as Yes>
-- Review track: <Internal + external | Internal-only>
-- Acknowledgement: <verbatim or N/A>
-- Classification corroboration: <checked N datasets | not applicable | unavailable>
 - User-visible behavior changes: <none | list with sign-off>
 
 ## Phase & Gate Tracker
@@ -283,7 +240,6 @@ A task is ready when these are known or explicitly deferred:
 - Goal and non-goals.
 - Expected user or system behavior.
 - Inputs, outputs, and contracts.
-- Data classification and review track.
 - Acceptance criteria.
 - Test expectations.
 - Failure behavior.
@@ -300,7 +256,6 @@ ship directly to production.
 A change is done only when:
 
 - Acceptance criteria are met.
-- Data-classification and review-track decisions are recorded.
 - Tests and required checks pass or a waiver is documented.
 - Security, privacy, and data impacts are reviewed.
 - User-visible behavior changes are approved.
@@ -319,7 +274,7 @@ Production repositories SHOULD include:
 - `RUNBOOK.md` for operational workflows.
 - Test, lint, typecheck, and build commands.
 - Deploy instructions and environment mapping.
-- Security/privacy notes, including the project's restricted-data categories (§1.1).
+- Security/privacy notes.
 - Data dictionary, semantic model, or catalog link for data projects.
 - Decision logs, ADRs, or a link to the central decision-log directory.
 
@@ -607,7 +562,6 @@ Every repo that expects agent help SHOULD include `AGENTS.md`:
 ## Testing Standards
 
 ## Security and Privacy Rules
-- Restricted-data categories for this project (Guidebook §1.1):
 
 ## Data Rules
 
@@ -641,9 +595,6 @@ Every repo that expects agent help SHOULD include `AGENTS.md`:
 - Tag restricted data and apply masking or row-level controls where the platform supports them.
 - Verify object ownership and grants after any recreate operation, and verify with a **real
   invocation** using the intended executing identity — not only a compile or deploy check.
-
-The project's **restricted-data categories** (§1.1) are the input to every rule above. Define them
-once in `AGENTS.md` and reference them; do not restate them per workflow.
 
 ### 9.2 Secrets
 
@@ -884,9 +835,7 @@ What changed and why?
 - [ ] LLM/prompt/agent behavior
 - [ ] Documentation
 
-## Data Classification / Privacy
-- Restricted data: <No | Yes | Unsure treated as Yes>
-- Review track: <Internal + external | Internal-only>
+## Decision Log
 - Decision log:
 
 ## User-Visible Behavior Changes
@@ -1074,7 +1023,6 @@ Use this scoring model in project reviews.
 | Area | 0 | 1 | 2 | 3 |
 |---|---|---|---|---|
 | Requirements | Undefined | Partial | Clear | Clear, testable, traceable |
-| Data classification / privacy | Not classified | Informal | Classified and recorded | Corroborated, auditable, enforced |
 | Architecture | Ad hoc | Some boundaries | Documented | Documented with ADRs and failure modes |
 | Idempotency | Unsafe | Partial | Mostly retry-safe | Retry-safe with evidence |
 | Testing | Manual only | Basic automated | Good coverage | Risk-based, automated, traceable |
@@ -1086,8 +1034,8 @@ Use this scoring model in project reviews.
 | CI enforcement | None | Manual checklist | CI runs tests | CI enforces generated artifacts and registries |
 | Maintainability | High burden | Some docs | Clear docs | Low operational burden, clear ownership |
 
-Production readiness target: no category below 2. High-risk systems should target 3 in data
-classification/privacy, security, observability, idempotency, and testing.
+Production readiness target: no category below 2. High-risk systems should target 3 in security,
+observability, idempotency, and testing.
 
 ---
 
@@ -1125,15 +1073,14 @@ shared/platform.example.md  <- the template it is copied from
 
 Run `/so-init` to be interviewed and have it written, or copy the template and fill it in by hand.
 
-**Seven sections, in `platform.md`:** environment separation · event-trigger mechanism · deploy
-commands (and what each does *not* cover) · data classification tooling · shared internal packages ·
-reference implementations · project-specific additions.
+**Six sections, in `platform.md`:** environment separation · event-trigger mechanism · deploy
+commands (and what each does *not* cover) · shared internal packages · reference implementations ·
+project-specific additions.
 
 **Rules in this guide that stay principles until `platform.md` answers them:**
 
 | Guidebook rule | Needs |
 |---|---|
-| §2.2 classification corroboration | Data classification tooling |
 | §5.3 use shared packages | Shared internal packages |
 | §7.3 event-triggered, not polled | Event-trigger mechanism |
 | §11.2 post-deploy verification | Deploy commands |
@@ -1145,7 +1092,7 @@ silently passing. The system fails honestly instead of inventing platform mechan
 
 Verify current vendor and standards documentation for:
 
-- The platform's data classification, masking, and access-control features.
+- The platform's access-control features.
 - The platform's scheduling, event, and pipeline primitives.
 - The platform's deploy tooling and CLI behavior.
 - Agent/skill authoring and installation behavior for the agent runtime in use.

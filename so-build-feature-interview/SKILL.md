@@ -14,7 +14,7 @@ external reviewer to run; it produces a review-ready plan and hands off.
 ## Setup
 
 **Load `cadence-core.md`** (same folder) first. It defines the shared cadence used here: Core
-Principles, the restricted-data gate + review-track classification, the three external review gates,
+Principles, the three external review gates,
 the handoff format, the decision-log artifact + template, and the field-tested learnings — it is the
 **operational profile** of the guidebook (`shared/guidebook.md` is the canonical standard; run
 `/so-best-practice-audit` to audit work against it). This SKILL.md only adds the
@@ -41,16 +41,13 @@ Ask the user (use the question tool, group sensibly):
 4. **Toolchain**: how tests run, how it deploys, and where correctness is validated post-deploy
    (smoke script, validation procedure, or "none"). Read these from the repo where you can rather
    than making the user recite them.
-5. **Restricted-data screen** — ask exactly as specified in `cadence-core.md` (Review-Track
-   Classification), stating the project's categories from its `AGENTS.md`.
 
 **Output:** A filled interview record (kept in context for Step 4).
 
-### Step 2: Risk & Data Classification
+### Step 2: Risk
 
-Apply the **Review-Track Classification** from `cadence-core.md` and honor its MANDATORY STOP
-before any planning. Also set the change's **risk** (`Standard` | `High`) here — it feeds the
-external gates' reasoning effort.
+Set the change's **risk** (`Standard` | `High`) here — it feeds the external gates' reasoning
+effort.
 
 ### Step 3: Discovery + Baseline Scan (read-only)
 
@@ -59,9 +56,7 @@ external gates' reasoning effort.
 1. Explore the relevant code paths read-only (use an Explore subagent for anything broad).
 2. **Native-capability reconnaissance** — before proposing custom logic, check the platform docs and
    the native skill catalog for existing features/skills that already cover part of this work, and
-   prefer composing them (per the "Prefer native capability" principle in `cadence-core.md`). If the
-   feature touches named datasets, run the **Optional corroboration** from `cadence-core.md` and
-   re-raise the data gate if it contradicts the self-attestation.
+   prefer composing them (per the "Prefer native capability" principle in `cadence-core.md`).
 3. Run the **baseline best-practice scan** and report gaps as *encouraged, not required*:
    - Automated tests / test runner present?
    - Post-deploy smoke or data-validation surface present?
@@ -110,22 +105,20 @@ Then **write the decision log** using the template in `cadence-core.md` (Feature
 
 ### Step 5: Handoff
 
-Use the **Standard handoff format** in `cadence-core.md`, including its placeholders for private
-infrastructure and personal paths in the plan and supporting evidence.
+Use the **Standard handoff format** in `cadence-core.md`.
 
-- If the review track includes external review: ask the developer to confirm, then run gate G1 via
-  `/so-codex-review` (mode `plan`), passing `restricted`, `review_track`, and `risk`. On no, hand the
-  plan over for manual review.
-- If internal-only: proceed to execution within the agent per the approved plan.
+- Ask the developer to confirm, then run gate G1 via `/so-codex-review` (mode `plan`), passing
+  `risk`. On no, hand the plan over for manual review and proceed within the agent per the approved
+  plan.
 
 This skill ends at handoff — implementation is done by the normal agent flow, not here.
 
 ## Stopping Points
 
-- ✋ Step 2: after data classification / review-track acknowledgement
+- ✋ Step 2: after the risk level is set
 - ✋ Step 4: after plan + decision log presented, before handoff
 
 ## Output
 
 A review-ready phased plan following the shared cadence, plus a persisted decision-log artifact
-recording the interview, data classification, review track, and baseline gaps.
+recording the interview, risk, and baseline gaps.

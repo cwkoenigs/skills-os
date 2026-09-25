@@ -1,6 +1,6 @@
 ---
 name: so-skills
-description: "The root wrapper for ALL skill work — the front door over the native skill-development skill. Use whenever creating, summarizing a session into, auditing, refactoring, or compiling a skill in this repo. Wraps native skill-development and adds the repo layer: so- naming, README/install.sh registration, build.sh wiring, the cadence-core data gate, an auto best-practice audit, and external review. Triggers: so-skills, build skill, new skill, create team skill, add a skill, audit skill, refactor skill, compile skill, summarize session into skill, contribute to skill-os."
+description: "The root wrapper for ALL skill work — the front door over the native skill-development skill. Use whenever creating, summarizing a session into, auditing, refactoring, or compiling a skill in this repo. Wraps native skill-development and adds the repo layer: so- naming, README/install.sh registration, build.sh wiring, an auto best-practice audit, and external review. Triggers: so-skills, build skill, new skill, create team skill, add a skill, audit skill, refactor skill, compile skill, summarize session into skill, contribute to skill-os."
 user-invocable: true
 ---
 
@@ -20,27 +20,12 @@ gate for this repo, plus the repo glue the native skill can't know about.
    `SKILL_BEST_PRACTICES.md` (canonical structure, conciseness, red flags). Do not
    duplicate it here.
 2. **Point to** `shared/cadence-core.md` (shipped alongside this skill as `cadence-core.md`) for the
-   change cadence. This skill applies it lightweight (Step 0); load the full cadence only for
-   material work.
+   change cadence. This skill applies it lightweight; load the full cadence only for material
+   work.
 3. **Confirm** you are working in the `skill-os` repo (skills live at repo root as
    `<name>/SKILL.md`). If not, ask the user for the repo path.
 
 ## Workflow
-
-### Step 0: Data gate + review track (run FIRST, every time)
-
-Ask (do not assume), stating the project's restricted-data categories from `AGENTS.md`:
-```
-Does this skill work read, write, derive from, or display restricted data
-(as defined for this project)?  — No / Yes / Unsure
-```
-Derive the track (treat **Unsure as Yes**):
-- `No` → review track **Internal + external** (external review available in Step 6).
-- `Yes` / `Unsure` → **Internal-only**; no external review anywhere in this flow.
-
-Skill files are usually clear, but the gate is cheap and it decides Step 6. For material changes,
-point the user to `cadence-core.md` for the fuller cadence (phased plan, decision log). Record the
-answer + track in your working notes.
 
 ### Step 1: Detect intent (detection-first, ask only if ambiguous)
 
@@ -109,12 +94,9 @@ reference it.
 1. **Auto-run** `/so-best-practice-audit` on the drafted/changed skill. Surface its findings and
    resolve High/Medium flags before commit. This keeps skills aligned to the guidebook
    automatically.
-2. **Review track (from Step 0):**
-   - Restricted = `No` → ask the developer to confirm before routing the skill diff through
-     `/so-codex-review` (it enforces its own fail-closed gate as a backstop) — do not invoke
-     automatically. On explicit yes, apply its prescribed fixes; re-review only if a fix adds new
-     scope. On no or no response, keep review internal-only.
-   - Restricted = `Yes`/`Unsure` → **skip external review**; keep review internal-only.
+2. **External review:** ask the developer to confirm before routing the skill diff through
+   `/so-codex-review` — do not invoke automatically. On explicit yes, apply its prescribed fixes;
+   re-review only if a fix adds new scope. On no or no response, keep review internal.
 
 **⚠️ STOP**: Present audit + review results and get approval to proceed to registration
 (Step 7).
@@ -145,7 +127,6 @@ If a skill should be excluded from the default install (like `so-codex-review`),
 
 ## Stopping Points
 
-- ✋ Step 0: data-gate answer required before proceeding.
 - ✋ Step 1: If intent is ambiguous, confirm which one.
 - ✋ Step 6: After audit + review, before registering.
 - ✋ Step 8: Final review, before committing.

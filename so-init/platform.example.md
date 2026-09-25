@@ -12,7 +12,6 @@
   decisions are never at risk of being overwritten.
 
   Guidebook §17 points here. Several guidebook rules are principles until this file answers them:
-    §2.2  classification corroboration  <- needs "Data classification tooling"
     §7.3  event-triggered, not polled    <- needs "Event-trigger mechanism"
     §11.2 post-deploy verification       <- needs "Deploy commands"
     §5.3  use shared packages            <- needs "Shared internal packages"
@@ -100,32 +99,7 @@ The real command per artifact type — **and what each one does not cover.**
 
 ---
 
-## 4. Data classification tooling
-
-*Referenced by Guidebook §1.1 (restricted data), §2.2 (corroboration).*
-
-The automated classification the platform offers, used read-only to corroborate a developer's
-self-attestation about restricted data.
-
-<!--
-  The self-attestation in §2.2 is authoritative and always runs. This is the second signal that
-  can only STRENGTHEN the gate, never downgrade it.
-
-  Name the read API and the field that indicates sensitivity. Examples:
-    - BigQuery: policy tags / data catalog taxonomy on column metadata
-    - AWS: Macie findings, read via GetFindings
-    - Postgres: pgcrypto column comments or an in-house classification table
-    - None available: say so explicitly. Corroboration then degrades to attestation-only, which
-      is a documented state, not a gap to hide.
-
-  MUST be read-only. Do not trigger an on-demand classification scan from a review workflow.
--->
-
-<!-- your answer, or "none available — attestation only" -->
-
----
-
-## 5. Shared internal packages
+## 4. Shared internal packages
 
 *Referenced by Guidebook §5.3.*
 
@@ -146,7 +120,7 @@ The canonical packages to use instead of hand-rolling platform access, auth, or 
 
 ---
 
-## 6. Reference implementations
+## 5. Reference implementations
 
 *Referenced by Guidebook §1.2 (prefer existing capability).*
 
@@ -165,7 +139,7 @@ In-house examples worth copying, with links.
 
 ---
 
-## 7. Project-specific additions
+## 6. Project-specific additions
 
 Anything the guidebook does not cover that this stack requires. Optional.
 
