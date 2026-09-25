@@ -15,6 +15,7 @@ shows file names only; the Markdown contains starter guidance to customize.
 | `so-changes` | Summarize a set of code changes |
 | `so-codex-review` | Review code for actionable defects |
 | `so-init` | Establish project context and conventions |
+| `so-install` | Link the so-* skills into Claude Code and Codex on this machine |
 | `so-skills` | Create or update skills in the collection |
 | `tests/` | Future behavioral checks and fixtures |
 
