@@ -19,7 +19,7 @@ session ──capture──▶ .captures/*.md (local drafts, gitignored)
                                             future so-recall ◀──────────┘
 ```
 
-Files already drafted in this folder:
+Files already drafted in `so-capture/`:
 
 | File | What it is |
 |---|---|

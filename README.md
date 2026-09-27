@@ -12,6 +12,7 @@ shows file names only; the Markdown contains starter guidance to customize.
 | `so-best-practice-audit` | Review a project against relevant practices |
 | `so-bug-review-interview` | Clarify and investigate a reported bug |
 | `so-build-feature-interview` | Turn a feature request into an implementation brief |
+| `so-capture` | Capture session gotchas, decisions and discoveries; flush them to the team knowledge repo as an MR |
 | `so-changes` | Summarize a set of code changes |
 | `so-codex-review` | Review code for actionable defects |
 | `so-init` | Establish project context and conventions |
