@@ -11,6 +11,7 @@ shows file names only; the Markdown contains starter guidance to customize.
 | `shared/` | Source files for common guidance and templates (`platform.md` is project-owned and gitignored) |
 | `so-best-practice-audit` | Review a project against relevant practices |
 | `so-bug-review-interview` | Clarify and investigate a reported bug |
+| `so-capture` | Capture session problems, decisions and gotchas as draft records, then flush them to the team knowledge repo for review |
 | `so-build-feature-interview` | Turn a feature request into an implementation brief |
 | `so-changes` | Summarize a set of code changes |
 | `so-codex-review` | Review code for actionable defects |
