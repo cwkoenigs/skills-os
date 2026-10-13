@@ -3,8 +3,9 @@
 ## Project Overview
 
 `skill-os` is a skill system skeleton: a canonical standard (`shared/guidebook.md`), a change cadence
-that executes it (`shared/cadence-core.md`), six skills, a vendoring generator (`build.sh`), and CI
-guards. See `README.md` for the architecture.
+that executes it (`shared/cadence-core.md`), the `so-*` skills (one folder each; `./install.sh --list --all`
+is the current list), a vendoring generator (`build.sh`), and CI guards. Owner: Clark Koenigs
+(`cwkoenigs` on GitHub). See `README.md` for the architecture.
 
 ## Architecture Boundaries
 
@@ -38,7 +39,7 @@ No dependencies beyond `bash`, `git`, and `python3`.
 ./tests/verify.sh
 ```
 
-Six checks, one exit code: generated-copies, machine-paths, registry, readme-table, skill-size,
+Seven checks, one exit code: generated-copies, machine-paths, registry, readme-table, frontmatter, skill-size,
 platform-split. Run after changing anything in `shared/` or adding a skill.
 
 `verify.sh` is the single source of check logic. CI configs are **generated per-project** by

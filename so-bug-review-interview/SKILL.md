@@ -1,6 +1,6 @@
 ---
 name: so-bug-review-interview
-description: "Guided workflow for diagnosing and fixing bugs with review cadence"
+description: "Turn a bug report into a reproduced, root-caused, phased fix plan with a decision log and external review gates. Use for any incorrect, broken, regressed or silently-wrong behavior in an existing app. Triggers: so-bug-review-interview, fix this bug, something broke, regression, wrong output, root cause, reproduce this, bug review, why is this failing, data looks wrong."
 user-invocable: true
 ---
 

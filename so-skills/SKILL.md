@@ -116,7 +116,7 @@ If a skill should be excluded from the default install (like `so-codex-review`),
 
 1. Verify SKILL.md is < 500 lines and the router stays thin. If it's over, move detail into
    `references/` rather than shipping an oversized router.
-2. Run `./tests/verify.sh` — all six checks, one exit code. Report the result; do not claim success
+2. Run `./tests/verify.sh` — all seven checks, one exit code. Report the result; do not claim success
    without running it.
 3. If shared sources were wired, confirm `./build.sh` ran and the generated copies are staged.
 

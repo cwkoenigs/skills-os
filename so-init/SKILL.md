@@ -59,7 +59,7 @@ Scan the repo root and one level down for:
 | `README.md`, existing `RUNBOOK.md` | environments, deploy steps, owners |
 
 Also check: `git remote -v` (this identifies the **git host**, which decides the CI provider in
-Step 5 — `github.com` → Actions, a GitLab host → GitLab CI, `bitbucket.org` → Pipelines, no remote →
+Step 4 — `github.com` → Actions, a GitLab host → GitLab CI, `bitbucket.org` → Pipelines, no remote →
 offer a local hook), and whether CI config and deploy config disagree about commands — that
 disagreement is worth surfacing.
 
@@ -125,7 +125,7 @@ thin wrapper around it, so it is generated per-environment rather than shipped.
 If the user declines CI, say so plainly and tell them the manual command — do not skip silently and
 leave them assuming they are covered.
 
-### Step 6: Report and hand off
+### Step 5: Report and hand off
 
 State plainly:
 - Which of the six sections are filled, and which the user deferred.

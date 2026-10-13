@@ -1,6 +1,6 @@
 ---
 name: so-build-feature-interview
-description: "Guided workflow for planning and building a new feature with review cadence"
+description: "Turn a feature request on an existing app into a reviewed, phased implementation plan with a decision log and external review gates. Triggers: so-build-feature-interview, plan this feature, add a feature, scope this change, build an enhancement, implementation plan, feature cadence, new capability, how should we build."
 user-invocable: true
 ---
 

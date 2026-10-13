@@ -1,6 +1,6 @@
 # CI templates
 
-Thin per-provider configs for `so-init` Step 5 to generate. Every one of them does the same thing:
+Thin per-provider configs for `so-init` Step 4 to generate. Every one of them does the same thing:
 check out the repo and run `./tests/verify.sh`.
 
 **Why they are this short.** `tests/verify.sh` is the single source of check logic. A provider config

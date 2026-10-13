@@ -1,9 +1,8 @@
 ---
 name: so-capture
 description: Capture problems, discoveries, decisions and gotchas from a coding session into structured draft records, then flush them to the team knowledge repo as a GitLab MR for review before publication. Use whenever the user says "capture this", "note this", "remember this for the team", "this is a gotcha", "write this up", "/capture", or asks to flush, list, or review pending captures — and proactively offer a capture when a session hits a hard-won fix, a surprising platform behaviour, or a decision with trade-offs, even if the user doesn't ask.
+user-invocable: true
 ---
-
-<!-- vendored: shared/guidebook.md, shared/cadence-core.md (build.sh) -->
 
 # so-capture
 
@@ -14,10 +13,10 @@ Publication is never automatic — merge is the gate.
 ## Step 0 — Data gate (ask every time, never assume)
 
 This skill writes to a GitLab remote and reads a token from the environment.
-Per `AGENTS.md`: internal-only review track. Before the first capture in a session,
-confirm the target repo is the team knowledge repo and that nothing in the record
-is restricted data. Never embed hostnames, project IDs, account identifiers, key
-paths or tokens in this skill or in any record. All routing comes from config at runtime.
+Before the first capture in a session, confirm the target repo is the team knowledge
+repo. The one content rule is Guidebook §9.2: a credential never enters a record, a
+log or a handoff. Never embed hostnames, project IDs, account identifiers, key paths
+or tokens in this skill or in any record. All routing comes from config at runtime.
 
 ## Config (read at runtime, never hardcoded)
 

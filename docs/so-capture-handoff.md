@@ -1,5 +1,9 @@
 # so-capture — session kickoff
 
+> Moved out of `so-capture/` on 2026-10-09: a skill folder ships to every installer and holds
+> only `SKILL.md` plus `references/` and `assets/` (AGENTS.md coding standards). Phases 2–5 below
+> are still open.
+
 Read this whole file, then start at **Phase 1**. Do not re-litigate the decisions in
 "Decisions made"; they were settled deliberately. Ask only where "Open" says to.
 

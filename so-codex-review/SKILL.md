@@ -1,6 +1,6 @@
 ---
 name: so-codex-review
-description: "Standalone external reviewer — routes a plan, diff, or branch delta to the local Codex CLI and returns a normalized verdict / findings / next-action. Composable by any workflow."
+description: "Route a plan, an uncommitted diff, or a branch delta to the local Codex CLI for an external review and return a normalized verdict, findings and next action. Used by the cadence gates G1, G2 and G3 and usable standalone. Triggers: so-codex-review, external review, second opinion, review my plan, review this diff, review the branch, codex review, gate review, pre-rollout review."
 user-invocable: true
 ---
 
@@ -25,10 +25,11 @@ is a credential (Step 1.5), and that is checked silently.
 
 ### Step 1 — CLI detection
 
-Prepend the common install path, then detect:
+Prepend the common install path, then detect. The path below is the macOS Homebrew default;
+use `$CODEX_BIN_DIR` or the platform's own location when it differs:
 
 ```bash
-export PATH="/opt/homebrew/bin:$PATH"
+export PATH="${CODEX_BIN_DIR:-/opt/homebrew/bin}:$PATH"
 command -v codex
 ```
 
