@@ -9,6 +9,12 @@ Skills are versioned as a collection: a release here is a release of every `so-*
 ## [Unreleased]
 
 ### Added
+- `so-agent-setup`: registers `ds serve-mcp` with Claude Code, Codex, and Cortex Code and verifies `manifest_status`; the Cortex Code location is discovered on the machine, never guessed.
+
+### Changed
+- `so-init`, `so-changes`, `so-capture`, `so-best-practice-audit` retargeted to the `ds` knowledge system: repos get docs, manifest and hook from `ds new`/`ds migrate`; local decisions go in `DECISIONS.md`; insights and captures are proposed to the canon; audits read adoption status with `ds canon list` and cite standards by id. The bundled guidebook remains the fallback for repos outside the system.
+
+### Added
 
 - CI: `.github/workflows/verify.yml` runs `./tests/verify.sh` on every push and pull request,
   so the committed generated copies are proven fresh unattended (Guidebook §11.1).

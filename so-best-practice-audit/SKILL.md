@@ -35,6 +35,10 @@ Triggers: "audit this project", "best practice review", "does this meet our stan
 
 ## Prerequisites
 
+- **Prefer the canon when the target is in the knowledge system.** If the target has
+  `.ds/manifest.toml` and `ds canon list` succeeds there, the standards and their adoption status
+  come from the canon: cite standards by `id` (and by guidebook § where the standard was split from
+  it). The bundled guidebook below is the fallback for repositories outside the system.
 - **The bundled guidebook exists at `references/guidebook.md`.** If missing, stop and say so (do not
   audit from memory — the canonical standard must be present).
 - **The bundled platform standards exist at `references/platform.md`.** This is the project-owned
@@ -46,7 +50,12 @@ Triggers: "audit this project", "best practice review", "does this meet our stan
 
 ### Step 0 — Preflight (run FIRST, every time)
 
-1. **Locate the standard** — confirm `references/guidebook.md` is present; note its Version/Date
+0. **Read the manifest first** — in a knowledge-system repo, run `ds canon list` (and
+   `ds reconcile --check`). It tells you which standards apply, which are adopted, which are
+   declined and why, and which are pending. A declined standard is not a finding: cite the decline
+   and its revisit date. A pending one is a finding against `adr-000`, not against the standard.
+   Load each applicable standard's text with `ds canon read <id>`.
+1. **Locate the standard** — otherwise confirm `references/guidebook.md` is present; note its Version/Date
    (from the guidebook's `**Version:**` line) so findings cite a known standard revision.
 2. **Resolve the target** — ask for (or infer from the open repo) *what* is being audited and a
    one-line description of the work. Keep the target's content local (see caution above).

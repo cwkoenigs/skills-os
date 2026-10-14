@@ -9,13 +9,14 @@ shows file names only; the Markdown contains starter guidance to customize.
 | --- | --- |
 | `docs/adr/` | Architecture decision records (`/so-changes adr` writes the next one) |
 | `shared/` | Source files for common guidance and templates (`platform.md` is project-owned and gitignored) |
-| `so-best-practice-audit` | Review a project against relevant practices |
+| `so-agent-setup` | Register the `ds` MCP server (canon + manifest tools) with Claude Code, Codex, and Cortex Code on this machine, discovering Cortex Code's settings location rather than guessing |
+| `so-best-practice-audit` | Review a project against the standards that apply to it (from the canon via `ds canon list`, else the bundled guidebook) |
 | `so-bug-review-interview` | Clarify and investigate a reported bug |
-| `so-capture` | Capture session problems, decisions and gotchas as draft records, then flush them to the team knowledge repo for review |
+| `so-capture` | Capture session problems, decisions and gotchas as draft records, then flush them to the canon for review |
 | `so-build-feature-interview` | Turn a feature request into an implementation brief |
-| `so-changes` | Record ADRs, log the changelog, draft announcements, cut releases, capture cross-project insights |
+| `so-changes` | Record local decisions in `DECISIONS.md`, log the changelog, draft announcements, cut releases, propose cross-project insights as canon standards |
 | `so-codex-review` | Review code for actionable defects |
-| `so-init` | Adopt skill-os into a project: detect the stack, write `shared/platform.md`, generate the CI config |
+| `so-init` | Adopt skill-os into a project: run `ds new`/`ds migrate`, detect the stack, write `shared/platform.md`, generate the CI config |
 | `so-install` | Link the so-* skills into Claude Code and Codex on this machine |
 | `so-skills` | Create or update skills in the collection |
 | `tests/` | Future behavioral checks and fixtures |

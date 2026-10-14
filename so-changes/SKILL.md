@@ -23,6 +23,10 @@ If the request plausibly matches two modes, ask once which one.
 
 ## Step 0: Scaffold Check (run FIRST, every time)
 
+First, is this repository in the knowledge system? If `.ds/manifest.toml` exists, local decisions
+live in `DECISIONS.md` (written by `ds new`) and org-wide decisions are standards in the canon;
+do not scaffold `docs/adr/` or `docs/insights/` in such a repo. Otherwise, legacy layout applies.
+
 Check whether `docs/adr/`, `docs/decisions/`, and `CHANGELOG.md` exist in the project root. If
 missing, create only what the current mode needs:
 
@@ -54,9 +58,15 @@ Establish, from the conversation where possible rather than by interrogation:
 - How you will know the decision worked (validation).
 
 ### 1b: Number and write
-Find the highest existing `NNN-` prefix in `docs/adr/` and use the next integer, zero-padded to 3.
-Write `docs/adr/<NNN>-<kebab-slug>.md` using the ADR Template. Status starts `Accepted` when the
-decision is already made, `Proposed` when it needs sign-off.
+**Repo in the knowledge system (`.ds/manifest.toml` exists):** the decision is repo-local, so it
+goes in `DECISIONS.md` as a section `## local-NNN: <Decision title>` (next integer after the highest
+`local-NNN` present), with the same fields as the ADR Template below. Replace the file's
+"None yet." line on the first decision. If the decision is really org-wide, it is a standard, not a
+local ADR: go to Step 5 and propose it to the canon instead.
+
+**Legacy repo:** find the highest existing `NNN-` prefix in `docs/adr/` and use the next integer,
+zero-padded to 3. Write `docs/adr/<NNN>-<kebab-slug>.md` using the ADR Template. Status starts
+`Accepted` when the decision is already made, `Proposed` when it needs sign-off.
 
 ### 1c: Chain offer
 Offer once: log a CHANGELOG entry (Step 2), draft an announcement (Step 3), or stop.
@@ -132,8 +142,15 @@ elsewhere, not a change log entry.
 - The evidence: the concrete cases that produced it (at least two — one case is an anecdote).
 - What to do about it: the actionable rule.
 
-### 5b: Draft the insight doc
-Write `docs/insights/<kebab-slug>.md`:
+### 5b: Draft the insight
+**With a canon available** (`$DS_CANON` or `../canon` has `index.json`): an insight that generalizes
+is a proposed standard. Write `<canon>/<kebab-id>.md` with front matter `id`, `version: 1`, `title`,
+`applies_to` (tags, or `["*"]`), `owner`, `status: proposed`, and `date`; put the pattern, evidence,
+and rule below it, and an `## Apply` section when there is a mechanical step. Run
+`python scripts/build_index.py` in the canon and open a merge request there. Do not push without
+asking. Skip 5d: the canon's owner review is the promotion.
+
+**Without a canon:** write `docs/insights/<kebab-slug>.md`:
 
 ```markdown
 # <Insight title>

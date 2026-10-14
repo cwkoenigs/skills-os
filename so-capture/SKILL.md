@@ -14,7 +14,7 @@ Publication is never automatic — merge is the gate.
 
 This skill writes to a GitLab remote and reads a token from the environment.
 Before the first capture in a session, confirm the target repo is the team knowledge
-repo. The one content rule is Guidebook §9.2: a credential never enters a record, a
+repo, which is the canon (the standards repository; captures land under `captures/` there). The one content rule is Guidebook §9.2: a credential never enters a record, a
 log or a handoff. Never embed hostnames, project IDs, account identifiers, key paths
 or tokens in this skill or in any record. All routing comes from config at runtime.
 
@@ -23,7 +23,7 @@ or tokens in this skill or in any record. All routing comes from config at runti
 `~/.config/so-capture/config.toml` (create if absent, ask the user for values):
 
 ```toml
-knowledge_repo = "<group/project slug>"   # slug only; host comes from GITLAB_HOST
+knowledge_repo = "<group/project slug>"   # the canon repository; slug only, host comes from GITLAB_HOST
 default_branch = "main"
 captures_dir   = "captures"               # path inside knowledge repo
 local_stage    = ".captures"              # relative to cwd; gitignored
@@ -89,9 +89,12 @@ A session-end / pre-compact hook that runs `list` and, if drafts exist, asks:
 
 ## Downstream (not this skill's job, documented for context)
 
-Merge in the knowledge repo triggers CI: build the docs site → deploy to SPCS;
+Merge in the canon triggers CI: rebuild `index.json`; later, render the portal to SPCS and
 load merged records into a Snowflake table → refresh the Cortex Search service.
 A future `so-recall` skill searches that service before starting work.
+
+A `decision` or `discovery` capture that generalizes beyond its repo is a candidate standard:
+propose it with `/so-changes insight`, which writes a `proposed` standard in the canon.
 
 ## Out of scope
 
