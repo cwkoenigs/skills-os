@@ -9,6 +9,7 @@ Skills are versioned as a collection: a release here is a release of every `so-*
 ## [Unreleased]
 
 ### Added
+- `so-ds-port`: ports the knowledge-system verbs into the team's real ds-cli by reading its structure and planning first; no git merge, no push.
 - `so-agent-setup`: registers `ds serve-mcp` with Claude Code, Codex, and Cortex Code and verifies `manifest_status`; the Cortex Code location is discovered on the machine, never guessed.
 
 ### Changed

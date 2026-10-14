@@ -16,6 +16,7 @@ shows file names only; the Markdown contains starter guidance to customize.
 | `so-build-feature-interview` | Turn a feature request into an implementation brief |
 | `so-changes` | Record local decisions in `DECISIONS.md`, log the changelog, draft announcements, cut releases, propose cross-project insights as canon standards |
 | `so-codex-review` | Review code for actionable defects |
+| `so-ds-port` | Port the knowledge-system feature from the GitHub reference into the real GitLab ds-cli: read its structure, plan, port on a local branch, never push or merge |
 | `so-init` | Adopt skill-os into a project: run `ds new`/`ds migrate`, detect the stack, write `shared/platform.md`, generate the CI config |
 | `so-install` | Link the so-* skills into Claude Code and Codex on this machine |
 | `so-skills` | Create or update skills in the collection |
