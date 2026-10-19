@@ -9,6 +9,7 @@ Skills are versioned as a collection: a release here is a release of every `so-*
 ## [Unreleased]
 
 ### Added
+- `so-install`: links every `so-*` skill from this checkout into Claude Code (`~/.claude/skills`) and Codex (`~/.codex/skills`) and verifies the links; `so-codex-review` is optional (`--all`). (95f8667; backfilled 2026-10-19, it had shipped unlogged.)
 - `so-ds-port`: ports the knowledge-system verbs into the team's real ds-cli by reading its structure and planning first; no git merge, no push.
 - `so-agent-setup`: registers `ds serve-mcp` with Claude Code, Codex, and Cortex Code and verifies `manifest_status`; the Cortex Code location is discovered on the machine, never guessed.
 

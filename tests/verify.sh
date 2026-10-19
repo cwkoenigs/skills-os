@@ -120,8 +120,6 @@ check_platform_split() {
     || { echo "shared/platform.example.md missing"; rc=1; }
   grep -q 'shared/platform.md' shared/guidebook.md \
     || { echo "guidebook §17 no longer points at shared/platform.md"; rc=1; }
-  grep -q 'references/platform.md' so-best-practice-audit/SKILL.md \
-    || { echo "so-best-practice-audit does not read references/platform.md"; rc=1; }
   return $rc
 }
 run platform-split check_platform_split

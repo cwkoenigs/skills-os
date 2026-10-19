@@ -12,7 +12,7 @@ is the current list), a vendoring generator (`build.sh`), and CI guards. Owner: 
 Policy flows one direction: **guidebook → cadence-core → vendored copies → skill runtime.**
 
 - `shared/` holds the only editable sources of policy.
-- `so-*/cadence-core.md` and `so-best-practice-audit/references/guidebook.md` are **generated**.
+- `so-*/cadence-core.md` and `so-init/platform.example.md` are **generated**.
   Never edit them. Edit the `shared/` source and run `./build.sh`.
 - Skills are flat: `so-<name>/SKILL.md` plus optional `references/`. No cross-skill imports —
   skills reference each other by invocation (`/so-codex-review`), not by file path.
