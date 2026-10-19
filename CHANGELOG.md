@@ -8,6 +8,13 @@ Skills are versioned as a collection: a release here is a release of every `so-*
 
 ## [Unreleased]
 
+### Removed
+- `so-ds-port`: it ported the knowledge system into the old `ds-cli`; `ds-next` replaced `ds-cli`, so there is nothing left to port. (303ca7c)
+- `so-best-practice-audit`: it audited work against the bundled 1,300-line guidebook. The guidebook was split into canon standards, and `ds-next reconcile` checks a repo against the standards it adopted, so the audit duplicated the canon. The guidebook stays in `shared/` as the cadence's citation source. **User-visible:** `/so-best-practice-audit` no longer exists; use `ds-next reconcile` and `canon_list`. (303ca7c)
+
+### Changed
+- `build.sh` no longer bundles the guidebook or the platform stub into a skill; `verify.sh`, README and AGENTS.md follow. (303ca7c)
+
 ### Added
 - `so-install`: links every `so-*` skill from this checkout into Claude Code (`~/.claude/skills`) and Codex (`~/.codex/skills`) and verifies the links; `so-codex-review` is optional (`--all`). (95f8667; backfilled 2026-10-19, it had shipped unlogged.)
 - `so-ds-port`: ports the knowledge-system verbs into the team's real ds-cli by reading its structure and planning first; no git merge, no push.
