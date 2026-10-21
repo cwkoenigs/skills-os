@@ -1,6 +1,6 @@
 ---
 name: so-init
-description: "Adopt skill-os into a project — runs `ds new` or `ds migrate` so the repo gets its docs, manifest and pre-push hook from the canon, then detects the stack and git host, interviews for the platform standards (Guidebook §17), and writes shared/platform.md and a CI config for the detected provider. Run once per project. Triggers: so-init, init skill-os, adopt skill-os, set up skill-os, configure platform standards, fill in section 17, platform.md, onboard this repo, bootstrap the guidebook, generate CI, set up CI, add a CI config."
+description: "Adopt skill-os into a project — runs `ds-next new` or `ds-next adopt` so the repo gets its docs, manifest and pre-push hook from the canon, then detects the stack and git host, interviews for the platform standards (Guidebook §17), and writes shared/platform.md and a CI config for the detected provider. Run once per project. Triggers: so-init, init skill-os, adopt skill-os, set up skill-os, configure platform standards, fill in section 17, platform.md, onboard this repo, bootstrap the guidebook, generate CI, set up CI, add a CI config."
 user-invocable: true
 ---
 
@@ -24,7 +24,7 @@ generated instead.
 
 ## Prerequisites
 
-- `ds` with the knowledge-system verbs (`ds new`, `ds migrate`, `ds reconcile`, `ds canon`) on the
+- `ds-next` with the knowledge-system verbs (`ds-next new`, `ds-next adopt`, `ds-next reconcile`, `ds-next canon`) on the
   PATH, and a canon checkout reachable (`$DS_CANON` or `../canon`). If either is missing, say so
   and continue with the platform interview only; do not fabricate a manifest.
 - `platform.example.md` is present in this skill's folder (the vendored template; it is the
@@ -42,8 +42,8 @@ the files. Do not write any of those files yourself.
 
 1. If `.ds/manifest.toml` exists, the repo is already in the system: run `ds reconcile` and report
    pending standards; skip to Step 0.
-2. If the repo has code but no manifest: run `ds migrate .` (old docs are kept under `.ds/legacy/`).
-3. If the directory is new: run `ds new <name> --dir .`.
+2. If the repo has code but no manifest: run `ds-next adopt .` (or `/adopt` in the terminal). It detects the stack, writes `.ds/manifest.toml`, AGENTS.md, DECISIONS.md and the hook, and changes nothing else; standards are pending until adopted from `/status`.
+3. If the directory is new: run `ds-next new <name> --answers answers.toml --dir .` (or `/new` in the terminal).
 4. Report the line `ds` prints (how many standards apply, adopted, declined) before continuing.
 
 The platform standards below (Guidebook §17) are the one thing the interview does not cover yet;
