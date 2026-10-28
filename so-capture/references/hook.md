@@ -1,13 +1,13 @@
 # Session-end flush reminder hook
 
 Purpose: make the flush step survive week three. The hook only *asks*; it never
-opens an MR itself.
+opens a PR or MR itself.
 
 ## Behaviour
 
 On session end (or before context compaction, if the platform exposes that event):
 
-1. If `<local_stage>` has any `status: draft` records, print:
+1. If `.ds/captures/` has any records not yet flushed (this skill's drafts and ds-next's), print:
    `so-capture: N unflushed capture(s) — <titles>. Run flush?`
 2. Nothing else. No auto-flush, no network calls.
 
@@ -16,9 +16,9 @@ On session end (or before context compaction, if the platform exposes that event
 ```sh
 #!/usr/bin/env sh
 # so-capture-remind.sh — session-end reminder
-stage="${SO_CAPTURE_STAGE:-.captures}"
+stage="${SO_CAPTURE_STAGE:-.ds/captures}"
 [ -d "$stage" ] || exit 0
-n=$(grep -l '^status: draft' "$stage"/*.md 2>/dev/null | wc -l | tr -d ' ')
+n=$(ls "$stage"/*.md 2>/dev/null | wc -l | tr -d ' ')      # flushed ones are in $stage/flushed/
 [ "$n" -gt 0 ] || exit 0
 echo "so-capture: $n unflushed capture(s):"
 grep -h '^title:' "$stage"/*.md | sed 's/^title: /  - /'
