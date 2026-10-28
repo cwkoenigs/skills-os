@@ -8,6 +8,9 @@ Skills are versioned as a collection: a release here is a release of every `so-*
 
 ## [Unreleased]
 
+### Changed
+- `so-capture` reads where to publish from the machine's one config, `~/.ds/config.toml` (`[world]`: `host`, `group`, `token_env`; `[capture]`: `repo`, `branch`, `dir`), which canon's `install.sh` writes, and flushes as a GitHub pull request at home or a GitLab merge request at work. The older `~/.config/so-capture/config.toml` is still read; with neither, the canon checkout's remote decides. Drafts live in `.ds/captures/`, where ds-next's `capture` tool writes too, so one flush takes both. **User-visible:** a draft in `.captures/` is no longer found; move it to `.ds/captures/`.
+
 ### Removed
 - `so-ds-port`: it ported the knowledge system into the old `ds-cli`; `ds-next` replaced `ds-cli`, so there is nothing left to port. (303ca7c)
 - `so-best-practice-audit`: it audited work against the bundled 1,300-line guidebook. The guidebook was split into canon standards, and `ds-next reconcile` checks a repo against the standards it adopted, so the audit duplicated the canon. The guidebook stays in `shared/` as the cadence's citation source. **User-visible:** `/so-best-practice-audit` no longer exists; use `ds-next reconcile` and `canon_list`. (303ca7c)
