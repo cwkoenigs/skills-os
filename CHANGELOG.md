@@ -8,6 +8,14 @@ Skills are versioned as a collection: a release here is a release of every `so-*
 
 ## [Unreleased]
 
+### Added
+- skills-os is in the knowledge system: `.ds/manifest.toml` (tags skills, markdown, bash; every
+  standard pending until the owner adopts it), a standards section in AGENTS.md, a DECISIONS.md and
+  the pre-push hook, written by `ds-next adopt`. The manifest declares what this repo provides to the
+  others (the nine `so-*` skills and their `SKILL.md` paths) and what it uses (canon's `index.json` and
+  `install.sh`, `ds-next new` and `ds-next adopt`), for the cross-repo graph canon's pipeline compiles
+  (canon adr-002).
+
 ### Changed
 - `so-capture` reads where to publish from the machine's one config, `~/.ds/config.toml` (`[world]`: `host`, `group`, `token_env`; `[capture]`: `repo`, `branch`, `dir`), which canon's `install.sh` writes, and flushes as a GitHub pull request at home or a GitLab merge request at work. The older `~/.config/so-capture/config.toml` is still read; with neither, the canon checkout's remote decides. Drafts live in `.ds/captures/`, where ds-next's `capture` tool writes too, so one flush takes both. **User-visible:** a draft in `.captures/` is no longer found; move it to `.ds/captures/`.
 

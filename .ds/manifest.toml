@@ -1,0 +1,16 @@
+[repo]
+name = "skills-os"
+tags = ["skills", "markdown", "bash"]
+created = "2026-10-30"
+adopted = "2026-10-30"
+ds_version = "0.2.0"
+canon = "/Users/clarkkoenigs/Developer/canon"
+canon_index = "2026-10-30"
+
+[provides]                 # what other repositories run, read or share (canon adr-002); matched as text
+skills = ["so-agent-setup", "so-bug-review-interview", "so-build-feature-interview", "so-capture", "so-changes", "so-codex-review", "so-init", "so-install", "so-skills"]
+paths = ["so-*/SKILL.md"]
+
+[uses]                     # one key per registered repository, in the words its [provides] uses
+canon = ["index.json", "install.sh"]          # so-capture publishes to the canon and reads the config install.sh writes
+ds-next = ["ds-next new", "ds-next adopt"]    # so-init runs them
